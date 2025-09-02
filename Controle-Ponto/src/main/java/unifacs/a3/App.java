@@ -39,7 +39,7 @@ public class App
                   id=rs.getInt("id");
 
                 }else{
-                     System.out.println("Usuario não cadastrado")  ;           //rs.getString("nome") ;
+                     System.out.println("Usuario não cadastrado")  ;           
             }
         }        
             if(user_cadastrado)
@@ -53,7 +53,7 @@ public class App
             ps.executeUpdate();
 
              }else{
-                //LocalDateTime saida= LocalDateTime.now();
+                
                  rs = stmt.executeQuery("SELECT id FROM horarios WHERE saida IS NULL ORDER BY id DESC LIMIT 1");
                  if (rs.next()){
                     int id_buscado=rs.getInt("id");
@@ -63,10 +63,7 @@ public class App
                     ps.executeUpdate();
 
 
-                   //System.out.println(saida);
-                   System.out.println("Update realizado com sucesso!");
-                   System.out.println(id_buscado);
-
+                  
                     
                  }
 
@@ -120,4 +117,24 @@ String password = "miniProject25@";
         }
    return conn;
     }
+
+
+    public static boolean verificaUser(String nome_user, int senha_user) throws Exception{
+          Connection connect=conexao_BD();
+           boolean user_cadastrado=false;
+
+                Statement stmt=connect.createStatement();
+                ResultSet rs = stmt.executeQuery("SELECT * FROM usuario");
+                while (rs.next()) {
+                if(rs.getString("nome").equals(nome_user) && senha_user==rs.getInt("senha") ){
+                 user_cadastrado=true;
+                  int id=rs.getInt("id");
+
+                }else{
+                     System.out.println("Usuario não cadastrado")  ;           
+            }
+        }
+         return user_cadastrado;
+    }
 }
+
