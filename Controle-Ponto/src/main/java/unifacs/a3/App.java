@@ -17,10 +17,25 @@ public class App {
 
     public static void main(String[] args) throws Exception {
 
+       int alternativa=0;
         Scanner scan = new Scanner(System.in);
+      
+        //Acesso ao Sistema
+      
+            
+        
+        System.out.println("Digite seu nome:");
+                // consumir quebra de linha
+                String nome_user = scan.nextLine();
+                
+                System.out.println("Digite sua senha:");
+                int senha_user = scan.nextInt();
 
+                // Verifica se o usuário existe no BD
+                Resultado r1 = verificaUser(nome_user, senha_user);
+         if (r1.user_encontrado()) {
         // Menu inicial
-        System.out.println("Selecione uma opção:\n1-Registrar ponto\n2-Cadastrar Funcionario\n3-Recuperar acesso");
+        System.out.println("Selecione uma opção:\n1-Registrar ponto\n2-Cadastrar Funcionario\n3-Registrar justificativa de atraso");
         int opcao = scan.nextInt();
 
         //--------------------------------------------------------------
@@ -28,18 +43,7 @@ public class App {
 
             // ------------------------- CASE 1: Registrar ponto -------------------------
             case 1:
-                System.out.println("Digite seu nome:");
-                scan.nextLine(); // consumir quebra de linha
-                String nome_user = scan.nextLine();
-
-                System.out.println("Digite sua senha:");
-                int senha_user = scan.nextInt();
-
-                // Verifica se o usuário existe no BD
-                Resultado r1 = verificaUser(nome_user, senha_user);
-
-                if (r1.user_encontrado()) {
-                    System.out.println("1-Entrada\n2-Saída");
+                 System.out.println("1-Entrada\n2-Saída");
                     int resposta = scan.nextInt();
 
                     // ----------------- REGISTRA ENTRADA -----------------
@@ -75,11 +79,8 @@ public class App {
                             System.out.println("Saída registrada com sucesso");
                         }
                     }
-                } else {
-                    // usuário não encontrado → apenas volta ao menu
+                
                     break;
-                }
-                break;
 
             // ------------------------- CASE 2: Cadastrar funcionário -------------------------
             case 2:
@@ -100,17 +101,27 @@ public class App {
                 }
                 break;
 
-            // ------------------------- CASE 3: Recuperar acesso -------------------------
+            // ------------------------- CASE 3: Justificar atraso -------------------------
             case 3:
-                System.out.println("Ainda não implementado");
-                break;
+               System.out.println() ;
+               break;
+            
 
-            // ------------------------- DEFAULT -------------------------
-            default:
-                break;
         }
 
-        scan.close();
+        
+        }else{
+            System.out.println("Usuário não cadastrado");
+            System.out.println("1-Recuperar senha\n2-Sair");
+            alternativa=scan.nextInt();
+            if(alternativa==1){
+                System.out.println("digite seu email:");
+                recupera_senha();
+
+            }
+        
+    
+    }
     }
 
     // ------------------------- MÉTODOS AUXILIARES -------------------------
@@ -148,8 +159,7 @@ public class App {
         if (rs.next()) {
             user_cadastrado = true;
             id = rs.getInt("id");
-        } else {
-            System.out.println("Usuário não cadastrado");
+        
         }
 
         return new Resultado(id, user_cadastrado);
@@ -168,5 +178,26 @@ public class App {
         ps.executeUpdate();
 
         return horario_registrado = true;
+    }
+    public static void recupera_senha() throws Exception{
+        Scanner scan=new Scanner(System.in);
+        String email= scan.nextLine();
+        Connection con= conexao_BD();
+       String sql = "SELECT  FROM usuario WHERE email = ?";
+        PreparedStatement ps = con.prepareStatement(sql);
+        ps.setString(1, email);
+        ResultSet rs=ps.executeQuery();
+        if(rs.next()){
+            System.out.println("Digite sua nova senha:");
+            int senha_nova=scan.nextInt();
+            ps=con.prepareStatement("UPDATE usuario set senha=? where email=?");
+            ps.setInt(1,senha_nova);
+            ps.setString(2,email);
+            ps.executeUpdate();
+             System.out.println("Senha alterada com sucesso!");
+        }else{
+            System.out.println("Usuário não encontrado!");
+        
+        }
     }
 }
