@@ -103,7 +103,14 @@ public class App {
 
             // ------------------------- CASE 3: Justificar atraso -------------------------
             case 3:
-               System.out.println() ;
+               System.out.println("Selecione o código de justificativa:");
+                System.out.println("1 - Falta Injustificada");
+                System.out.println("2 - Atestado");
+                System.out.println("3 - Saída Antecipada");
+                System.out.println("4 - Hora Extra");
+
+                justifica_atraso(r1.id_user());
+
                break;
             
 
@@ -200,4 +207,44 @@ public class App {
         
         }
     }
+    public static void justifica_atraso(int id) throws Exception{
+        Scanner scan=new Scanner(System.in);
+                int justificativa = scan.nextInt();
+            Connection connect=conexao_BD();
+                switch (justificativa) {
+                    case 1:
+                      PreparedStatement pr=connect.prepareStatement("INSERT INTO justificativa(tipo,usuario_id) values(?,?)");
+                      pr.setInt(2, id);
+                      pr.setString(1,"Falta Injustificada");
+                        pr.executeUpdate();
+                        System.out.println("Justificativa registrada: Falta Injustificada");                        
+                        break;
+                    case 2:
+                    pr=connect.prepareStatement("INSERT INTO justificativa(tipo,usuario_id) values(?,?)");
+                    pr.setInt(2, id);
+                      pr.setString(1,"Atestado");
+                      pr.executeUpdate();
+                        System.out.println("Justificativa registrada: Atestado");                       
+                        break;
+                    case 3:
+                    pr=connect.prepareStatement("INSERT INTO justificativa(tipo,usuario_id) values(?,?)");
+                    pr.setInt(2, id);
+                    pr.setString(1,"Saída Antecipada");
+                    pr.executeUpdate();
+                        System.out.println("Justificativa registrada: Saída Antecipada");                       
+                        break;
+                    case 4:
+                     pr=connect.prepareStatement("INSERT INTO justificativa(tipo,usuario_id) values(?,?)");
+                    pr.setInt(2, id);
+                    pr.setString(1,"Hora Extra");
+                    pr.executeUpdate();
+                        System.out.println("Justificativa registrada: Hora Extra");                     
+                        break;
+                    default:
+                        System.out.println("Opção inválida.");
+                }
+
+                scan.close();
+    }
+
 }
