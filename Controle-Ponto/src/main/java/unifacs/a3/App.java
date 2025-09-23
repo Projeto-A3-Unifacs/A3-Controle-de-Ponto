@@ -35,7 +35,7 @@ public class App {
                 Resultado r1 = verificaUser(nome_user, senha_user);
          if (r1.user_encontrado()) {
         // Menu inicial
-        System.out.println("Selecione uma opção:\n1-Registrar ponto\n2-Cadastrar Funcionario\n3-Registrar justificativa de atraso");
+        System.out.println("Selecione uma opção:\n1-Registrar ponto\n2-Cadastrar Funcionario\n3-Registrar justificativa de atraso\n5-verificar atrasos");
         int opcao = scan.nextInt();
 
         //--------------------------------------------------------------
@@ -112,6 +112,11 @@ public class App {
                 justifica_atraso(r1.id_user());
 
                break;
+
+               case 5:
+               System.out.println("Verificando atrasos...");
+               verifica_atraso(r1.id_user());
+            break;
             
 
         }
@@ -242,9 +247,41 @@ public class App {
                         break;
                     default:
                         System.out.println("Opção inválida.");
+
+                        
+       
                 }
 
                 scan.close();
     }
 
-}
+
+    public static void verifica_atraso(int id) throws Exception {
+    Connection connect = conexao_BD();
+    Statement stmt = connect.createStatement();
+
+    // Definindo horário limite de entrada (08:00 da manhã)
+    LocalTime horarioLimite = LocalTime.of(8, 0);
+
+    // Consulta entradas do usuário
+    ResultSet rs = stmt.executeQuery(
+        "SELECT entrada FROM horarios WHERE usuario_id = " + id
+    );
+
+    boolean encontrou = false;
+
+    while (rs.next()) {
+        LocalDateTime entrada = rs.getTimestamp("entrada").toLocalDateTime();
+
+        if (entrada.toLocalTime().isAfter(horarioLimite)) {
+            System.out.println("Atraso registrado no dia: " + entrada.toLocalDate());
+            encontrou = true;
+        }
+    }
+
+    }
+
+    }
+
+
+
