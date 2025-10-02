@@ -107,7 +107,83 @@ public class App {
 
             }
         
+// ------------------------- CASE 4: Registrar ponto -------------------------
+            case 4:
+                
+// Conta faltas semanais
+                
+public static int faltasSemanais(int usuarioId) throws Exception {
+    Connection con = conexao_BD();
+
+    // Pegamos a data de hoje e voltamos 7 dias
     
+    LocalDate hoje = LocalDate.now();
+    LocalDate semanaPassada = hoje.minusDays(7);
+
+    String sql = "SELECT DISTINCT DATE(entrada) as dia FROM horarios WHERE usuario_id =
+        AND entrada BETWEEN ps.setObject(2, primeiroDia.atStartOfDay()) AND ps.setObject(3, hoje.atTime(23,59,59))";";
+    PreparedStatement ps = con.prepareStatement(sql);
+    
+    ps.setInt(1, usuarioId);
+    ps.setObject(2, semanaPassada.atStartOfDay());
+    ps.setObject(3, hoje.atTime(23,59,59));
+    ResultSet rs = ps.executeQuery();
+
+    // Guardamos os dias que o usuário compareceu
+    java.util.Set<LocalDate> diasTrabalhados = new java.util.HashSet<>();
+    while (rs.next()) {
+        diasTrabalhados.add(rs.getDate("dia").toLocalDate());
+    }
+
+    // Agora verificamos de segunda a sexta dessa semana
+    int faltas = 0;
+    LocalDate dia = semanaPassada;
+    while (!dia.isAfter(hoje)) {
+        if (dia.getDayOfWeek() != DayOfWeek.SATURDAY && dia.getDayOfWeek() != DayOfWeek.SUNDAY) {
+            if (!diasTrabalhados.contains(dia)) {
+                faltas++;
+            }
+        }
+        dia = dia.plusDays(1);
+    }
+
+    return faltas;
+}
+
+// Conta faltas mensais
+public static int faltasMensais(int usuarioId) throws Exception {
+    Connection con = conexao_BD();
+
+    LocalDate hoje = LocalDate.now();
+    LocalDate primeiroDia = hoje.withDayOfMonth(1);
+
+    String sql = "SELECT DISTINCT DATE(entrada) as dia FROM horarios WHERE usuario_id = usuario_id
+        AND entrada BETWEEN ps.setObject(2, primeiroDia.atStartOfDay()) AND ps.setObject(3, hoje.atTime(23,59,59))";
+    PreparedStatement ps = con.prepareStatement(sql);
+    ps.setInt(1, usuarioId);
+    ps.setObject(2, primeiroDia.atStartOfDay());
+    ps.setObject(3, hoje.atTime(23,59,59));
+    ResultSet rs = ps.executeQuery();
+
+    java.util.Set<LocalDate> diasTrabalhados = new java.util.HashSet<>();
+    while (rs.next()) {
+        diasTrabalhados.add(rs.getDate("dia").toLocalDate());
+    }
+
+    int faltas = 0;
+    LocalDate dia = primeiroDia;
+    while (!dia.isAfter(hoje)) {
+        if (dia.getDayOfWeek() != DayOfWeek.SATURDAY && dia.getDayOfWeek() != DayOfWeek.SUNDAY) {
+            if (!diasTrabalhados.contains(dia)) {
+                faltas++;
+            }
+        }
+        dia = dia.plusDays(1);
+    }
+
+    return faltas;
+}
+             
     }
     }
 
