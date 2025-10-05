@@ -1,14 +1,16 @@
 package unifacs.a3;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Scanner;
 
-public class Usuario {
+public class UsuarioBD {
 
      public static Connection conexao_BD()  {
         String url = "jdbc:postgresql://aws-1-us-east-1.pooler.supabase.com:6543/postgres?sslmode=require";
@@ -23,7 +25,7 @@ public class Usuario {
     }
 //cadastro de usuário
     public static void cadastra_Usuario(String nome, int senha ) throws Exception {
-          try (Connection conectando = Conexao.conexao_BD()) {
+          try (Connection conectando = conexao_BD()) {
                     PreparedStatement ps = conectando.prepareStatement(
                         "INSERT INTO usuario (nome, senha) VALUES (?, ?)"
                     );
@@ -35,7 +37,7 @@ public class Usuario {
 
   //verificação de usuário
     public static Resultado verificaUser(String nome_user, int senha_user) throws Exception {
-        Connection connect =Conexao.conexao_BD();
+        Connection connect =conexao_BD();
         boolean user_cadastrado = false;
         int id = 0;
 
@@ -62,7 +64,7 @@ public class Usuario {
 
   //Registra ponto de entrada
    public static boolean registra_Hora(LocalDateTime entrada, int usuario_id) throws Exception {
-        Connection connect =Conexao.conexao_BD();
+        Connection connect =conexao_BD();
         boolean horario_registrado = false;
 
         PreparedStatement ps = connect.prepareStatement(
@@ -78,7 +80,7 @@ public class Usuario {
 
   //Registra ponto de saída
     public static void registra_Saida( ) throws Exception {
-           Connection connect = Conexao.conexao_BD();
+           Connection connect = conexao_BD();
                         Statement stmt = connect.createStatement();
 
                         // Busca o último registro sem saída
@@ -107,7 +109,7 @@ public class Usuario {
    public static void recupera_senha() throws Exception{
         Scanner scan=new Scanner(System.in);
         String email= scan.nextLine();
-        Connection con= Conexao.conexao_BD();
+        Connection con= conexao_BD();
        String sql = "SELECT  FROM usuario WHERE email = ?";
         PreparedStatement ps = con.prepareStatement(sql);
         ps.setString(1, email);

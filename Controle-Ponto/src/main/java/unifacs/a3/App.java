@@ -32,7 +32,7 @@ public class App {
                 int senha_user = scan.nextInt();
 
                 // Verifica se o usuário existe no BD
-                Resultado r1 = Usuario.verificaUser(nome_user, senha_user);
+                Resultado r1 = UsuarioBD.verificaUser(nome_user, senha_user);
          if (r1.user_encontrado()) {
         // Menu inicial
         System.out.println("Selecione uma opção:\n1-Registrar ponto\n2-Cadastrar Funcionario\n3-Registrar justificativa de atraso\n5-verificar atrasos");
@@ -49,7 +49,7 @@ public class App {
                     // ----------------- REGISTRA ENTRADA -----------------
                     if (resposta == 1) {
                         LocalDateTime entrada = LocalDateTime.now();
-                        boolean registrado =Usuario.registra_Hora(entrada, r1.id_user());
+                        boolean registrado =UsuarioBD.registra_Hora(entrada, r1.id_user());
 
                         if (registrado) {
                             System.out.println("Sua entrada foi registrada com sucesso");
@@ -57,7 +57,7 @@ public class App {
 
                     // ----------------- REGISTRA SAÍDA -----------------
                     } else {
-                        Usuario.registra_Saida( );
+                        UsuarioBD.registra_Saida( );
                         System.out.println("Sua saída foi registrada com sucesso");
                     }
                 
@@ -71,7 +71,7 @@ public class App {
 
                 System.out.println("Crie uma nova senha:");
                 int senha = scan.nextInt();
-                Usuario.cadastra_Usuario(nome, senha);
+                UsuarioBD.cadastra_Usuario(nome, senha);
                 break;
 
             // ------------------------- CASE 3: Justificar atraso -------------------------
@@ -85,7 +85,10 @@ public class App {
                 justifica_atraso(r1.id_user());
 
                break;
-
+             case 4:
+             System.out.println("Faltas na semana: " + faltasSemanais(r1.id_user()));
+             System.out.println("Faltas no mês: " + faltasMensais(r1.id_user()));
+             break;
                  // ------------------------- CASE 5: Verificar Atrasos -------------------------
 
             case 5:
@@ -103,86 +106,12 @@ public class App {
             alternativa=scan.nextInt();
             if(alternativa==1){
                 System.out.println("digite seu email:");
-                Usuario.recupera_senha();
+                UsuarioBD.recupera_senha();
 
             }
         
 // ------------------------- CASE 4: Registrar ponto -------------------------
-            case 4:
-                
-// Conta faltas semanais
-                
-public static int faltasSemanais(int usuarioId) throws Exception {
-    Connection con = conexao_BD();
-
-    // Pegamos a data de hoje e voltamos 7 dias
-    
-    LocalDate hoje = LocalDate.now();
-    LocalDate semanaPassada = hoje.minusDays(7);
-
-    String sql = "SELECT DISTINCT DATE(entrada) as dia FROM horarios WHERE usuario_id =
-        AND entrada BETWEEN ps.setObject(2, primeiroDia.atStartOfDay()) AND ps.setObject(3, hoje.atTime(23,59,59))";";
-    PreparedStatement ps = con.prepareStatement(sql);
-    
-    ps.setInt(1, usuarioId);
-    ps.setObject(2, semanaPassada.atStartOfDay());
-    ps.setObject(3, hoje.atTime(23,59,59));
-    ResultSet rs = ps.executeQuery();
-
-    // Guardamos os dias que o usuário compareceu
-    java.util.Set<LocalDate> diasTrabalhados = new java.util.HashSet<>();
-    while (rs.next()) {
-        diasTrabalhados.add(rs.getDate("dia").toLocalDate());
-    }
-
-    // Agora verificamos de segunda a sexta dessa semana
-    int faltas = 0;
-    LocalDate dia = semanaPassada;
-    while (!dia.isAfter(hoje)) {
-        if (dia.getDayOfWeek() != DayOfWeek.SATURDAY && dia.getDayOfWeek() != DayOfWeek.SUNDAY) {
-            if (!diasTrabalhados.contains(dia)) {
-                faltas++;
-            }
-        }
-        dia = dia.plusDays(1);
-    }
-
-    return faltas;
-}
-
-// Conta faltas mensais
-public static int faltasMensais(int usuarioId) throws Exception {
-    Connection con = conexao_BD();
-
-    LocalDate hoje = LocalDate.now();
-    LocalDate primeiroDia = hoje.withDayOfMonth(1);
-
-    String sql = "SELECT DISTINCT DATE(entrada) as dia FROM horarios WHERE usuario_id = usuario_id
-        AND entrada BETWEEN ps.setObject(2, primeiroDia.atStartOfDay()) AND ps.setObject(3, hoje.atTime(23,59,59))";
-    PreparedStatement ps = con.prepareStatement(sql);
-    ps.setInt(1, usuarioId);
-    ps.setObject(2, primeiroDia.atStartOfDay());
-    ps.setObject(3, hoje.atTime(23,59,59));
-    ResultSet rs = ps.executeQuery();
-
-    java.util.Set<LocalDate> diasTrabalhados = new java.util.HashSet<>();
-    while (rs.next()) {
-        diasTrabalhados.add(rs.getDate("dia").toLocalDate());
-    }
-
-    int faltas = 0;
-    LocalDate dia = primeiroDia;
-    while (!dia.isAfter(hoje)) {
-        if (dia.getDayOfWeek() != DayOfWeek.SATURDAY && dia.getDayOfWeek() != DayOfWeek.SUNDAY) {
-            if (!diasTrabalhados.contains(dia)) {
-                faltas++;
-            }
-        }
-        dia = dia.plusDays(1);
-    }
-
-    return faltas;
-}
+// Removido o case 4 e métodos daqui. Adicione chamadas aos métodos conforme necessário no menu.
              
     }
     }
@@ -198,7 +127,7 @@ public static int faltasMensais(int usuarioId) throws Exception {
     public static void justifica_atraso(int id) throws Exception{
         Scanner scan=new Scanner(System.in);
                 int justificativa = scan.nextInt();
-            Connection connect=Conexao.conexao_BD();
+            Connection connect=UsuarioBD.conexao_BD();
                 switch (justificativa) {
                     case 1:
                       PreparedStatement pr=connect.prepareStatement("INSERT INTO justificativa(tipo,usuario_id) values(?,?)");
@@ -240,7 +169,7 @@ public static int faltasMensais(int usuarioId) throws Exception {
 
 
     public static void verifica_atraso(int id) throws Exception {
-    Connection connect = Conexao.conexao_BD();
+    Connection connect = UsuarioBD.conexao_BD();
     Statement stmt = connect.createStatement();
 
     // Definindo horário limite de entrada (08:00 da manhã)
@@ -253,17 +182,89 @@ public static int faltasMensais(int usuarioId) throws Exception {
 
     boolean encontrou = false;
 
-    while (rs.next()) {
-        LocalDateTime entrada = rs.getTimestamp("entrada").toLocalDateTime();
-
-        if (entrada.toLocalTime().isAfter(horarioLimite)) {
-            System.out.println("Atraso registrado no dia: " + entrada.toLocalDate());
-            encontrou = true;
+        while (rs.next()) {
+            LocalDateTime entrada = rs.getTimestamp("entrada").toLocalDateTime();
+    
+            if (entrada.toLocalTime().isAfter(horarioLimite)) {
+                System.out.println("Atraso registrado no dia: " + entrada.toLocalDate());
+                encontrou = true;
+            }
         }
-    }
-
-    }
-
+        // Fim do método verifica_atraso
+        }
+    
+        // ------------------------- MÉTODOS AUXILIARES -------------------------
+    
+        // Conta faltas semanais
+        public static int faltasSemanais(int usuarioId) throws Exception {
+            Connection con = UsuarioBD.conexao_BD();
+    
+            // Pegamos a data de hoje e voltamos 7 dias
+            LocalDate hoje = LocalDate.now();
+            LocalDate semanaPassada = hoje.minusDays(7);
+    
+            String sql = "SELECT DISTINCT DATE(entrada) as dia FROM horarios WHERE usuario_id = ? AND entrada BETWEEN ? AND ?";
+            PreparedStatement ps = con.prepareStatement(sql);
+    
+            ps.setInt(1, usuarioId);
+            ps.setObject(2, semanaPassada.atStartOfDay());
+            ps.setObject(3, hoje.atTime(23,59,59));
+            ResultSet rs = ps.executeQuery();
+    
+            // Guardamos os dias que o usuário compareceu
+            java.util.Set<LocalDate> diasTrabalhados = new java.util.HashSet<>();
+            while (rs.next()) {
+                diasTrabalhados.add(rs.getDate("dia").toLocalDate());
+            }
+    
+            // Agora verificamos de segunda a sexta dessa semana
+            int faltas = 0;
+            LocalDate dia = semanaPassada;
+            while (!dia.isAfter(hoje)) {
+                if (dia.getDayOfWeek() != DayOfWeek.SATURDAY && dia.getDayOfWeek() != DayOfWeek.SUNDAY) {
+                    if (!diasTrabalhados.contains(dia)) {
+                        faltas++;
+                    }
+                }
+                dia = dia.plusDays(1);
+            }
+    
+            return faltas;
+        }
+    
+        // Conta faltas mensais
+        public static int faltasMensais(int usuarioId) throws Exception {
+            Connection con = UsuarioBD.conexao_BD();
+    
+            LocalDate hoje = LocalDate.now();
+            LocalDate primeiroDia = hoje.withDayOfMonth(1);
+    
+            String sql = "SELECT DISTINCT DATE(entrada) as dia FROM horarios WHERE usuario_id = ? AND entrada BETWEEN ? AND ?";
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setInt(1, usuarioId);
+            ps.setObject(2, primeiroDia.atStartOfDay());
+            ps.setObject(3, hoje.atTime(23,59,59));
+            ResultSet rs = ps.executeQuery();
+    
+            java.util.Set<LocalDate> diasTrabalhados = new java.util.HashSet<>();
+            while (rs.next()) {
+                diasTrabalhados.add(rs.getDate("dia").toLocalDate());
+            }
+    
+            int faltas = 0;
+            LocalDate dia = primeiroDia;
+            while (!dia.isAfter(hoje)) {
+                if (dia.getDayOfWeek() != DayOfWeek.SATURDAY && dia.getDayOfWeek() != DayOfWeek.SUNDAY) {
+                    if (!diasTrabalhados.contains(dia)) {
+                        faltas++;
+                    }
+                }
+                dia = dia.plusDays(1);
+            }
+    
+            return faltas;
+        }
+    
     }
 
 
