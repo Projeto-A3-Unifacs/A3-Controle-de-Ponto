@@ -2,64 +2,37 @@ package unifacs.a3;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.time.LocalDateTime;
 
 
 public class UsuarioBDTest {
 
 
     
-   // Teste simples do método verificaUser
+  //Teste simples de verificação de usuário
     @Test
-    void testVerificaUserSimples() {
-        // Simula o retorno de um usuário
-        Usuario usuario = new Usuario();
-        usuario.setId(1);
-        usuario.setNome("TesteUser");
-        usuario.setEmail("teste@email.com");
-        usuario.setSenha(1234);
+    void deveRetornarUsuario() {
+        
 
-        // Verificações
-        assertNotNull(usuario);
-        assertEquals(1, usuario.getId());
-        assertEquals("TesteUser", usuario.getNome());
-        assertEquals("teste@email.com", usuario.getEmail());
-        assertEquals(1234, usuario.getSenha());
+        Usuario usuario = CadastraEVerifica.verificaUser("TesteUser", 1234);
+
+        assertNotNull(usuario, "O método deveria retornar um usuário válido.");
+        assertEquals(1, usuario.getId(), "O ID retornado deveria ser 1.");
+        assertEquals("TesteUser", usuario.getNome(), "O nome do usuário não confere.");
+        assertEquals(1234, usuario.getSenha(), "A senha retornada não confere.");
+        assertEquals("teste@email.com", usuario.getEmail(), "O email retornado não confere.");
     }
 
     // Teste simples de cadastro de usuário
-    @Test
-    void testCadastraUsuarioSimples() {
-        // Simula cadastro
-        String nome = "NovoUser";
-        int senha = 5678;
+      @Test
+    void testSimulaCadastroUsuario() {
+        String nome = "Maria";
+        int senha = 1234;
 
-        Usuario usuario = new Usuario();
-        usuario.setNome(nome);
-        usuario.setSenha(senha);
+        boolean resultado = CadastraEVerifica.simulaCadastro(nome, senha);
 
-        // Verificações
-        assertEquals(nome, usuario.getNome());
-        assertEquals(senha, usuario.getSenha());
+        assertTrue(resultado, "O método deveria retornar true para um cadastro válido.");
     }
 
 
-   
 
-   
-
-    // Teste simples de recuperação de senha
-    @Test
-    void testRecuperaSenhaSimples() {
-        String email = "teste@email.com";
-        int senhaNova = 9999;
-
-        Usuario usuario = new Usuario();
-        usuario.setEmail(email);
-        usuario.setSenha(senhaNova);
-
-        // Verificações
-        assertEquals(email, usuario.getEmail());
-        assertEquals(senhaNova, usuario.getSenha());
-    }
 }
