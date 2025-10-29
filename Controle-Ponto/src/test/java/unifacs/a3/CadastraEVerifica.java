@@ -1,34 +1,41 @@
 package unifacs.a3;
 
+
 public class CadastraEVerifica {
 
+    
 
 
-
-
-     public static Usuario verificaUser(String nome, int senha) {
+     public static Usuario verificaUser(Usuario usuario, UsuarioBD usuarioBD) {
         // Simulando um "usuário válido"
-        if (nome.equals("TesteUser") && senha == 1234) {
-            Usuario u = new Usuario();
-            u.setId(1);
-            u.setNome(nome);
-            u.setEmail("teste@email.com");
-            u.setSenha(senha);
-            return u;
+       
+        try {   
+           
+            return usuarioBD.verificaUser(usuario);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }
-        // Caso contrário, retorna null (usuário não encontrado)
-        return null;
+
+
+       
     }
 
 
     // Simula o comportamento do método cadastra_Usuario (sem BD)
-    public static boolean simulaCadastro(String nome, int senha) {
-        if (nome == null || nome.isEmpty()) return false;
-        if (senha <= 0) return false;
+    public static boolean simulaCadastro(Usuario usuario)  {
+        try{
+        UsuarioBD usuarioBD = new UsuarioBD();
+        if (usuario.getNome() == null || usuario.getNome().isEmpty()) return false;
+        if (usuario.getSenha()<= 0) return false;
 
         // Simulação de "inserção" bem-sucedida
-        System.out.println("Usuário cadastrado: " + nome);
+        usuarioBD.cadastra_Usuario(usuario);
         return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
 }

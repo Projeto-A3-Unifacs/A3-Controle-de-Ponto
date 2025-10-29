@@ -39,17 +39,21 @@ public class Menu {
 
                 // ------------------------- CASE 2: Cadastrar funcionário -------------------------
                 case 2:
+                  UsuarioBD UsuarioBD = new UsuarioBD();
                     System.out.println("Digite o nome do funcionário:");
-                    scan.nextLine();
                     String novoNome = scan.nextLine();
-
+                    scan.nextLine();
+                     System.out.println("Digite o email do funcionário:");
+                    String novoEmail = scan.nextLine();
+                   
                     System.out.println("Crie uma nova senha:");
                     int novaSenha = scan.nextInt();
 
                     Usuario novoUsuario = new Usuario();
                     novoUsuario.setNome(novoNome);
                     novoUsuario.setSenha(novaSenha);
-                    UsuarioBD.cadastra_Usuario(novoUsuario.getNome(), novoUsuario.getSenha());
+                    novoUsuario.setEmail(novoEmail);
+                    UsuarioBD.cadastra_Usuario(novoUsuario);
                     break;
 
                 // ------------------------- CASE 3: Justificar atraso -------------------------

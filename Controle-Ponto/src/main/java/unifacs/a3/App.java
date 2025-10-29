@@ -10,14 +10,16 @@ public class App {
         Scanner scan = new Scanner(System.in);
 
         // Acesso ao Sistema
+        Usuario user= new Usuario();
         System.out.println("Digite seu nome:");
         String nome = scan.nextLine();
-
+         user.setNome(nome);
         System.out.println("Digite sua senha:");
         int senha = scan.nextInt();
-
+        user.setSenha(senha);
         // Verifica se o usuário existe no BD
-        Usuario usuario = UsuarioBD.verificaUser(nome, senha);
+        UsuarioBD usuarioBD = new UsuarioBD();
+        Usuario usuario =usuarioBD.verificaUser(user);
    //INICIO MENU
         if (usuario != null && usuario.getId() > 0) {
        Menu.start(usuario);
