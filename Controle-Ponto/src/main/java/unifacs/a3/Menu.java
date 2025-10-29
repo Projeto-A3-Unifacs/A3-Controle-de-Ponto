@@ -41,8 +41,8 @@ public class Menu {
                 case 2:
                   UsuarioBD UsuarioBD = new UsuarioBD();
                     System.out.println("Digite o nome do funcionário:");
-                    String novoNome = scan.nextLine();
-                    scan.nextLine();
+                    scan.nextLine();  // Consumir a nova linha pendente
+                    String novoNome =scan.nextLine();
                      System.out.println("Digite o email do funcionário:");
                     String novoEmail = scan.nextLine();
                    
