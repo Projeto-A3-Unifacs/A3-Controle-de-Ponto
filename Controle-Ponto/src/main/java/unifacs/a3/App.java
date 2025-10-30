@@ -30,7 +30,10 @@ public class App {
             alternativa = scan.nextInt();
             if (alternativa == 1) {
                 System.out.println("Digite seu email:");
-                UsuarioBD.recupera_senha();
+                scan.nextLine();
+                String email= scan.nextLine();
+               
+               System.out.println(usuarioBD.recupera_senha(email));
             }
         }
 

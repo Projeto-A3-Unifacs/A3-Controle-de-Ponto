@@ -67,9 +67,8 @@ public class UsuarioBD {
 
 //Recuperação de senha
 
-   public static void recupera_senha() throws Exception{
-        Scanner scan=new Scanner(System.in);
-        String email= scan.nextLine();
+   public  String recupera_senha(String email) throws Exception{
+      Scanner scan= new Scanner(System.in);
         Connection con= conexao_BD();
        String sql = "SELECT  FROM usuario WHERE email = ?";
         PreparedStatement ps = con.prepareStatement(sql);
@@ -82,9 +81,9 @@ public class UsuarioBD {
             ps.setInt(1,senha_nova);
             ps.setString(2,email);
             ps.executeUpdate();
-             System.out.println("Senha alterada com sucesso!");
+            
         }else{
-            System.out.println("Usuário não encontrado!");
+           return "Usuário não encontrado!";
         
         }
 
@@ -92,7 +91,8 @@ public class UsuarioBD {
     ps.close();
     con.close();
     scan.close();
+     return "Senha alterada!";
     }
 
-
+   
 }
