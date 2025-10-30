@@ -1,1 +1,0 @@
-Teste de CI - $(data do commit)
