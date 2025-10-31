@@ -1,0 +1,13 @@
+name: Commit message lint
+
+on:
+  pull_request:
+    branches: [ dev, main ]
+
+jobs:
+  commitlint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Lint PR title and commits with Conventional Commits
+        uses: wagoid/commitlint-github-action@v6
