@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: [ dev ]
+  pull_request:
+    branches: [ main, dev ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Detect build tool (Maven or Gradle)
+        id: bt
+        run: |
+          if [ -f "pom.xml" ]; then
+            echo "tool=maven" >> $GITHUB_OUTPUT
+          elif [ -f "build.gradle" ] || [ -f "build.gradle.kts" ]; then
+            echo "tool=gradle" >> $GITHUB_OUTPUT
+          else
+            echo "Nenhum Maven/Gradle encontrado"; exit 1
+          fi
+
+      - name: Build & Test (Maven)
+        if: steps.bt.outputs.tool == 'maven'
+        run: mvn -B -DskipTests=false verify
+
+      - name: Build & Test (Gradle)
+        if: steps.bt.outputs.tool == 'gradle'
+        run: |
+          chmod +x ./gradlew || true
+          ./gradlew test build --stacktrace
