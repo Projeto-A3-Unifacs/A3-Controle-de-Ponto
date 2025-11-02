@@ -8,11 +8,12 @@ jobs:
   commitlint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Validate Conventional Commits
         uses: wagoid/commitlint-github-action@v6
         with:
-  configFile: commitlint.config.mjs
+          configFile: commitlint.config.mjs
