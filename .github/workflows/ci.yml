@@ -10,7 +10,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Set up Java
         uses: actions/setup-java@v4
@@ -18,23 +19,48 @@ jobs:
           distribution: temurin
           java-version: '21'
 
-      - name: Detect build tool (Maven or Gradle)
-        id: bt
+      - name: Find build file (pom.xml or build.gradle)
+        id: find
         run: |
-          if [ -f "pom.xml" ]; then
+          set -e
+          MAVEN_FILE=$(git ls-files | grep -E '/?pom\.xml$' | head -n1 || true)
+          GRADLE_FILE=$(git ls-files | grep -E '/?build\.gradle(\.kts)?$' | head -n1 || true)
+
+          echo "MAVEN_FILE=$MAVEN_FILE"
+          echo "GRADLE_FILE=$GRADLE_FILE"
+
+          if [ -n "$MAVEN_FILE" ]; then
+            DIR=$(dirname "$MAVEN_FILE")
             echo "tool=maven" >> $GITHUB_OUTPUT
-          elif [ -f "build.gradle" ] || [ -f "build.gradle.kts" ]; then
+            echo "workdir=$DIR" >> $GITHUB_OUTPUT
+          elif [ -n "$GRADLE_FILE" ]; then
+            DIR=$(dirname "$GRADLE_FILE")
             echo "tool=gradle" >> $GITHUB_OUTPUT
+            echo "workdir=$DIR" >> $GITHUB_OUTPUT
           else
-            echo "Nenhum Maven/Gradle encontrado"; exit 1
+            echo "Nenhum pom.xml ou build.gradle(.kts) encontrado no repo."
+            echo "Verifique se o projeto Java foi commitado e em qual pasta está."
+            exit 1
           fi
 
+      - name: Show working directory and tree
+        run: |
+          echo "Working dir: ${{ steps.find.outputs.workdir }}"
+          ls -la "${{ steps.find.outputs.workdir }}"
+
       - name: Build & Test (Maven)
-        if: steps.bt.outputs.tool == 'maven'
+        if: steps.find.outputs.tool == 'maven'
+        working-directory: ${{ steps.find.outputs.workdir }}
         run: mvn -B -DskipTests=false verify
 
       - name: Build & Test (Gradle)
-        if: steps.bt.outputs.tool == 'gradle'
+        if: steps.find.outputs.tool == 'gradle'
+        working-directory: ${{ steps.find.outputs.workdir }}
         run: |
           chmod +x ./gradlew || true
-          ./gradlew test build --stacktrace
+          if [ -f "./gradlew" ]; then
+            ./gradlew test build --stacktrace
+          else
+            # sem wrapper: usa gradle de sistema
+            gradle test build --stacktrace
+          fi
