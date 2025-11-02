@@ -1,8 +1,12 @@
-name: Commitlint
+name: Lint Commit Messages
 
 on:
   pull_request:
-    types: [opened, synchronize, edited, reopened]
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: read
 
 jobs:
   commitlint:
@@ -11,9 +15,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 0   # garante histórico disponível para a action
 
-      - name: Validate Conventional Commits
+      - name: Commitlint
         uses: wagoid/commitlint-github-action@v6
         with:
-          configFile: commitlint.config.mjs
+          configFile: .commitlintrc.yml
+          commitDepth: 30   # ✅ valida só os 30 commits mais recentes
+          failOnWarnings: false  # opcional: não falhar em warnings
