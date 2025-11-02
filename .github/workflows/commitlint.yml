@@ -2,7 +2,8 @@ name: Lint Commit Messages
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
+    branches: [main, dev]
+    types: [opened, synchronize, reopened, edited]
 
 permissions:
   contents: read
@@ -11,15 +12,20 @@ permissions:
 jobs:
   commitlint:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0   # garante histórico disponível para a action
+          # Precisamos do histórico para a action decidir o recorte por commitDepth
+          fetch-depth: 0
 
-      - name: Commitlint
+      - name: Commitlint (validate recent commits only)
         uses: wagoid/commitlint-github-action@v6
         with:
+          # Use este arquivo se você tiver regras customizadas (ver abaixo)
           configFile: .commitlintrc.yml
-          commitDepth: 30   # ✅ valida só os 30 commits mais recentes
-          failOnWarnings: false  # opcional: não falhar em warnings
+          # 🔒 Limita a verificação aos commits mais recentes do PR
+          commitDepth: 28
+          # Opcional: evita falhar em avisos
+          failOnWarnings: false
