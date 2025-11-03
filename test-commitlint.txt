@@ -1,0 +1,2 @@
+Testando commitlint com mensagem válida
+Teste do commitlint na branch dev
