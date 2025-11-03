@@ -2,7 +2,7 @@ name: Lint Commit Messages
 
 on:
   pull_request:
-    branches: [main, dev, test/merge-commitlint]  # ← inclua sua base de teste aqui
+    branches: [main, dev, test/merge-commitlint]
     types: [opened, synchronize, reopened, edited]
 
 permissions:
@@ -12,13 +12,17 @@ permissions:
 jobs:
   commitlint:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      # 🔹 Adicionando condição para ignorar merges automáticos
       - name: Commitlint
+        if: "!contains(github.event.head_commit.message, 'Merge')"  # <-- ignora commits de merge
         uses: wagoid/commitlint-github-action@v6
         with:
           configFile: .commitlintrc.yml
-          commitDepth: 10        # PR de teste costuma ter poucos commits
+          commitDepth: 10
           failOnWarnings: false
