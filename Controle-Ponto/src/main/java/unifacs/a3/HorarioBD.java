@@ -53,7 +53,6 @@ public static void registra_Saida(int usuarioId) throws Exception {
             ps.setInt(2, id_buscado);
             ps.executeUpdate();
 
-            System.out.println("Saída registrada com sucesso");
             ps.close();
         } else {
             System.out.println("Nenhuma entrada aberta encontrada para o usuário.");
