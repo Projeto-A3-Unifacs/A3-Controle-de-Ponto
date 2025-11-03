@@ -63,8 +63,9 @@ public class Menu {
                     System.out.println("2 - Atestado");
                     System.out.println("3 - Saída Antecipada");
                     System.out.println("4 - Hora Extra");
+                    int justificativa = scan.nextInt(); 
 
-                    JustificativaBD.justifica_atraso(usuario.getId());
+                    JustificativaBD.justifica_atraso(usuario.getId(), justificativa);
                     break;
 
                 // ------------------------- CASE 4: Verificar faltas -------------------------

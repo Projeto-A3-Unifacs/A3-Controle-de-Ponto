@@ -33,7 +33,13 @@ public class App {
                 scan.nextLine();
                 String email= scan.nextLine();
                
-               System.out.println(usuarioBD.recupera_senha(email));
+               System.out.println("Digite sua nova senha:");
+               int novaSenha = scan.nextInt();
+
+               UsuarioRepository repo = new UsuarioRepository();
+               RecuperaSenhaService service = new RecuperaSenhaService(repo);
+
+              System.out.println(service.recuperarSenha(email, novaSenha));
             }
         }
 
