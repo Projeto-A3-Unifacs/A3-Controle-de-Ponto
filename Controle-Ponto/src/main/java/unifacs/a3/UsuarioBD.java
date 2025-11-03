@@ -65,34 +65,7 @@ public class UsuarioBD {
         return usuario;
     }
 
-//Recuperação de senha
 
-   public  String recupera_senha(String email) throws Exception{
-      Scanner scan= new Scanner(System.in);
-        Connection con= conexao_BD();
-       String sql = "SELECT  FROM usuario WHERE email = ?";
-        PreparedStatement ps = con.prepareStatement(sql);
-        ps.setString(1, email);
-        ResultSet rs=ps.executeQuery();
-        if(rs.next()){
-            System.out.println("Digite sua nova senha:");
-            int senha_nova=scan.nextInt();
-            ps=con.prepareStatement("UPDATE usuario set senha=? where email=?");
-            ps.setInt(1,senha_nova);
-            ps.setString(2,email);
-            ps.executeUpdate();
-            
-        }else{
-           return "Usuário não encontrado!";
-        
-        }
-
-    rs.close();
-    ps.close();
-    con.close();
-    scan.close();
-     return "Senha alterada!";
-    }
 
    
 }

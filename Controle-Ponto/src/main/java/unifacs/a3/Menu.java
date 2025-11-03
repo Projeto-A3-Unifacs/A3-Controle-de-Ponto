@@ -32,7 +32,7 @@ public class Menu {
                             System.out.println("Sua entrada foi registrada com sucesso");
                         }
                     } else {
-                        HorarioBD.registra_Saida();
+                        HorarioBD.registra_Saida(usuario.getId());
                         System.out.println("Sua saída foi registrada com sucesso");
                     }
                     break;
@@ -58,6 +58,7 @@ public class Menu {
 
                 // ------------------------- CASE 3: Justificar atraso -------------------------
                 case 3:
+                JustificativaAtraso justificativaAtraso = new JustificativaAtraso(new JustificativaBD());
                     System.out.println("Selecione o código de justificativa:");
                     System.out.println("1 - Falta Injustificada");
                     System.out.println("2 - Atestado");
@@ -65,7 +66,8 @@ public class Menu {
                     System.out.println("4 - Hora Extra");
                     int justificativa = scan.nextInt(); 
 
-                    JustificativaBD.justifica_atraso(usuario.getId(), justificativa);
+                    String resultado = justificativaAtraso.registrarJustificativa(usuario.getId(), justificativa);
+                    System.out.println(resultado);
                     break;
 
                 // ------------------------- CASE 4: Verificar faltas -------------------------

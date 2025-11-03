@@ -9,6 +9,8 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
 public class HorarioBD {
 
@@ -29,30 +31,40 @@ public class HorarioBD {
     }
 
 
-  //Registra ponto de saída
-    public static void registra_Saida( ) throws Exception {
-           Connection connect = UsuarioBD.conexao_BD();
-                        Statement stmt = connect.createStatement();
+  // Registra ponto de saída para um usuário específico
+public static void registra_Saida(int usuarioId) throws Exception {
+    Connection connect = UsuarioBD.conexao_BD();
+    
+    try {
+        // Busca o último registro sem saída para esse usuário
+        String sqlBusca = "SELECT id FROM horarios WHERE saida IS NULL AND usuario_id = ? ORDER BY id DESC LIMIT 1";
+        PreparedStatement stmtBusca = connect.prepareStatement(sqlBusca);
+        stmtBusca.setInt(1, usuarioId);
+        
+        ResultSet rs = stmtBusca.executeQuery();
 
-                        // Busca o último registro sem saída
-                        ResultSet rs = stmt.executeQuery(
-                            "SELECT id FROM horarios WHERE saida IS NULL ORDER BY id DESC LIMIT 1"
-                        );
+        if (rs.next()) {
+            int id_buscado = rs.getInt("id");
 
-                        if (rs.next()) {
-                            int id_buscado = rs.getInt("id");
+            // Atualiza a saída no registro encontrado
+            String sqlAtualiza = "UPDATE horarios SET saida = ? WHERE id = ?";
+            PreparedStatement ps = connect.prepareStatement(sqlAtualiza);
+            ps.setObject(1, Timestamp.valueOf(LocalDateTime.now()));
+            ps.setInt(2, id_buscado);
+            ps.executeUpdate();
 
-                            // Atualiza a saída no registro encontrado
-                            PreparedStatement ps = connect.prepareStatement(
-                                "UPDATE horarios SET saida = ? WHERE id = ?"
-                            );
-                            ps.setObject(1, Timestamp.valueOf(LocalDateTime.now()));
-                            ps.setInt(2, id_buscado);
-                            ps.executeUpdate();
+            System.out.println("Saída registrada com sucesso");
+            ps.close();
+        } else {
+            System.out.println("Nenhuma entrada aberta encontrada para o usuário.");
+        }
 
-                            System.out.println("Saída registrada com sucesso");
-                        }
-     }
+        rs.close();
+        stmtBusca.close();
+    } finally {
+        connect.close();
+    }
+}
 
 
      public static int faltasSemanais(int usuarioId) throws Exception {
@@ -122,24 +134,39 @@ public class HorarioBD {
 
 
     
-    public static void verifica_atraso(int id) throws Exception {
-        Connection connect = UsuarioBD.conexao_BD();
-        Statement stmt = connect.createStatement();
+     public static List<LocalDate> verifica_atraso(int id) throws Exception {
+        List<LocalDateTime> entradas = buscarEntradasPorUsuario(id);
+        List<LocalDate> atrasos = new ArrayList<>();
 
         LocalTime horarioLimite = LocalTime.of(8, 0);
 
-        ResultSet rs = stmt.executeQuery("SELECT entrada FROM horarios WHERE usuario_id = " + id);
-
-        boolean encontrou = false;
-        while (rs.next()) {
-            LocalDateTime entrada = rs.getTimestamp("entrada").toLocalDateTime();
+        for (LocalDateTime entrada : entradas) {
             if (entrada.toLocalTime().isAfter(horarioLimite)) {
-                System.out.println("Atraso registrado no dia: " + entrada.toLocalDate());
-                encontrou = true;
+                atrasos.add(entrada.toLocalDate());
             }
         }
-        if (!encontrou) {
-            System.out.println("Nenhum atraso encontrado.");
+
+        return atrasos;
+    }
+
+    // Método auxiliar: consulta o BD (ou pode ser substituído por dados falsos no teste)
+    public static List<LocalDateTime> buscarEntradasPorUsuario(int id) throws Exception {
+        Connection connect = UsuarioBD.conexao_BD();
+        Statement stmt = connect.createStatement();
+
+        ResultSet rs = stmt.executeQuery(
+            "SELECT entrada FROM horarios WHERE usuario_id = " + id
+        );
+
+        List<LocalDateTime> entradas = new ArrayList<>();
+        while (rs.next()) {
+            entradas.add(rs.getTimestamp("entrada").toLocalDateTime());
         }
+
+        rs.close();
+        stmt.close();
+        connect.close();
+
+        return entradas;
     }
 }
