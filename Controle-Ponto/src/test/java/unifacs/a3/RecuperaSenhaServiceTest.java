@@ -27,12 +27,12 @@ public class RecuperaSenhaServiceTest {
     void deveAtualizarSenhaQuandoUsuarioExiste() throws Exception {
        
         UsuarioRepository repo = mock(UsuarioRepository.class);
-        when(repo.existePorEmail("teste@email.com")).thenReturn(true);
+        when(repo.existePorEmail("benicio.gois@gtv.com")).thenReturn(true);
 
         RecuperaSenhaService service = new RecuperaSenhaService(repo);
 
       
-        String resultado = service.recuperarSenha("teste@email.com", 9999);
+        String resultado = service.recuperarSenha("benicio.gois@gtv.com", 9999);
 
         // Assert
         assertEquals("Senha alterada!", resultado);
