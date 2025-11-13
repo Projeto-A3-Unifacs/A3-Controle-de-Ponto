@@ -1,5 +1,6 @@
 package unifacs.a3;
 
+import java.sql.Connection;
 import java.time.LocalDateTime;
 import java.util.Scanner;
 

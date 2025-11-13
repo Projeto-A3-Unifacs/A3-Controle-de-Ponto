@@ -1,5 +1,6 @@
 package unifacs.a3;
 
+import java.sql.Connection;
 import java.util.Scanner;
 
 public class App {
@@ -36,10 +37,13 @@ public class App {
                System.out.println("Digite sua nova senha:");
                int novaSenha = scan.nextInt();
 
-               UsuarioRepository repo = new UsuarioRepository();
-               RecuperaSenhaService service = new RecuperaSenhaService(repo);
-
-              System.out.println(service.recuperarSenha(email, novaSenha));
+             try (Connection con = UsuarioBD.conexao_BD()) { 
+                      UsuarioRepository repo = new UsuarioRepository(con);
+                       RecuperaSenhaService service = new RecuperaSenhaService(repo);
+                       System.out.println(service.recuperarSenha(email, novaSenha));
+           } catch (Exception e) {
+              e.printStackTrace();
+                 }
             }
         }
 

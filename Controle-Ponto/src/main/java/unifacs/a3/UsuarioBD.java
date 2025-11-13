@@ -22,15 +22,15 @@ public class UsuarioBD {
     }
 //cadastro de usuário
     public  boolean cadastra_Usuario(Usuario usuario) throws Exception {
-          try (Connection conectando = conexao_BD()) {
-                    PreparedStatement ps = conectando.prepareStatement(
+        Connection con = conexao_BD();
+                    PreparedStatement ps = con.prepareStatement(
                         "INSERT INTO usuario (nome, senha,email) VALUES (?, ?,?)"
                     );
                     ps.setString(1,usuario.getNome());
                     ps.setInt(2,usuario.getSenha());
                     ps.setString(3,usuario.getEmail());
                     ps.executeUpdate();
-                }
+                
 
                 System.out.println("Usuário cadastrado com sucesso!");
                 return true;

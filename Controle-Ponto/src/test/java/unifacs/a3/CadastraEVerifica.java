@@ -7,7 +7,7 @@ public class CadastraEVerifica {
 
 
      public static Usuario verificaUser(Usuario usuario, UsuarioBD usuarioBD) {
-        // Simulando um "usuário válido"
+        
        
         try {   
            
