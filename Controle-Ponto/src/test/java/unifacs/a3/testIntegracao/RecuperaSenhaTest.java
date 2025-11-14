@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.sql.Connection;
-import java.sql.DriverManager;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -16,36 +16,26 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
-
+import unifacs.a3.UsuarioBD;
 import unifacs.a3.UsuarioRepository;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class RecuperaSenhaTest {
-
 
     private Connection connection;
     private UsuarioRepository repositorio;
 
     @BeforeAll
     void setupDatabase() throws SQLException {
-        connection = DriverManager.getConnection("jdbc:h2:mem:testdb;MODE=PostgreSQL;DB_CLOSE_DELAY=-1");
+        connection = UsuarioBD.conexao_BD();
         repositorio = new UsuarioRepository(connection);
 
-        try (Statement stmt = connection.createStatement()) {
-            stmt.execute("""
-                CREATE TABLE usuario (
-                    id SERIAL PRIMARY KEY,
-                    email VARCHAR(100) UNIQUE NOT NULL,
-                    senha INT NOT NULL
-                )
-            """);
-        }
     }
 
     @BeforeEach
     void popularBanco() throws SQLException {
         try (Statement stmt = connection.createStatement()) {
-            stmt.execute("TRUNCATE TABLE usuario");
-            stmt.execute("INSERT INTO usuario (email, senha) VALUES ('ana@email.com', 123), ('joao@email.com', 456)");
+            
+            stmt.execute("INSERT INTO usuario (nome, email, senha) VALUES ('lina','ana@email.com', 123), ('juca','joao@email.com', 456)");
         }
     }
 
@@ -73,10 +63,16 @@ public class RecuperaSenhaTest {
         }
     }
 
+
+    
     @AfterAll
-    void fecharConexao() throws SQLException {
+   void fecharConexao() throws SQLException {
+      //  Statement stmt = connection.createStatement(); 
+        
         connection.close();
     }
+    
 }
+
 
 
