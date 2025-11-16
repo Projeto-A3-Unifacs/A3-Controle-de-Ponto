@@ -67,7 +67,11 @@ public class RecuperaSenhaTest {
     
     @AfterAll
    void fecharConexao() throws SQLException {
-      //  Statement stmt = connection.createStatement(); 
+        PreparedStatement ps = connection.prepareStatement("DELETE FROM usuario WHERE nome = ? AND email = ? AND senha=?");
+            ps.setString(1, "lina");
+            ps.setString(2, "ana@email.com");
+            ps.setInt(3,999);
+            ps.executeUpdate();
         
         connection.close();
     }
