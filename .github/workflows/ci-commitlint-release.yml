@@ -28,14 +28,12 @@ jobs:
         id: find
         run: |
           set -e
-          # Procurando o arquivo pom.xml ou build.gradle dentro da pasta Controle-Ponto
           MAVEN_FILE=$(git ls-files | grep -E 'Controle-Ponto/pom\.xml$' | head -n1 || true)
           GRADLE_FILE=$(git ls-files | grep -E 'Controle-Ponto/build\.gradle(\\.kts)?$' | head -n1 || true)
           
           echo "MAVEN_FILE=$MAVEN_FILE"
           echo "GRADLE_FILE=$GRADLE_FILE"
 
-          # Verificando qual ferramenta usar (Maven ou Gradle)
           if [ -n "$MAVEN_FILE" ]; then
             DIR=$(dirname "$MAVEN_FILE")
             echo "tool=maven" >> $GITHUB_OUTPUT
@@ -46,7 +44,7 @@ jobs:
             echo "workdir=$DIR" >> $GITHUB_OUTPUT
           else
             echo "Nenhum arquivo Maven ou Gradle encontrado!"
-            exit 1  # Falha se não encontrar nenhum arquivo de build
+            exit 1
           fi
 
       - name: Run Maven Build
@@ -71,7 +69,7 @@ jobs:
         with:
           configFile: .commitlintrc.yml
           commitDepth: 10
-          failOnWarnings: false  # Caso queira falhar na execução com warning, mude para true
+          failOnWarnings: false
 
   # Etapa 3: CD - Geração de Versão Semântica
   cd:
