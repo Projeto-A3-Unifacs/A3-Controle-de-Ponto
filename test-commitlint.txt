@@ -1,4 +1,3 @@
 Testando commitlint com mensagem válida
 Teste do commitlint na branch dev
 Teste de commit para validação do commitlint.
-Teste de commit
