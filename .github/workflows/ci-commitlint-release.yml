@@ -10,6 +10,10 @@ jobs:
   # Etapa 1: CI - Build e Testes
   ci:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Permissões para manipulação de conteúdo (necessário para checkout)
+      pull-requests: write  # Permissões para criar e modificar pull requests
+      actions: write  # Permissões para ações do GitHub
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -54,6 +58,8 @@ jobs:
   commitlint:
     runs-on: ubuntu-latest
     needs: ci  # Esta etapa depende da conclusão da etapa de CI
+    permissions:
+      contents: read  # Apenas leitura do conteúdo para verificar commits
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -71,6 +77,9 @@ jobs:
   cd:
     runs-on: ubuntu-latest
     needs: commitlint  # Esta etapa depende da validação do commit
+    permissions:
+      contents: write  # Permissões para manipulação de conteúdo e tags
+      pull-requests: write  # Permissões para criar pull requests para versão
     steps:
       - name: Checkout
         uses: actions/checkout@v4
