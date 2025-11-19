@@ -11,9 +11,9 @@ jobs:
   ci:
     runs-on: ubuntu-latest
     permissions:
-      contents: write  # Permissões para manipulação de conteúdo (necessário para checkout)
-      pull-requests: write  # Permissões para criar e modificar pull requests
-      actions: write  # Permissões para ações do GitHub
+      contents: write
+      pull-requests: write
+      actions: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -49,20 +49,20 @@ jobs:
 
       - name: Run Maven Build
         run: |
-          cd Controle-Ponto  # Muda para o diretório onde o pom.xml está localizado
-          mvn clean install  # Executa o Maven no diretório correto
+          cd Controle-Ponto
+          mvn clean install
 
   # Etapa 2: Commitlint - Validação de Mensagens de Commit
   commitlint:
     runs-on: ubuntu-latest
-    needs: ci  # Esta etapa depende da conclusão da etapa de CI
+    needs: ci
     permissions:
-      contents: read  # Apenas leitura do conteúdo para verificar commits
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Importante para verificar os commits completos
+          fetch-depth: 0
       
       - name: Commitlint
         uses: wagoid/commitlint-github-action@v6
@@ -74,17 +74,17 @@ jobs:
   # Etapa 3: CD - Geração de Versão Semântica
   cd:
     runs-on: ubuntu-latest
-    needs: commitlint  # Esta etapa depende da validação do commit
+    needs: commitlint
     permissions:
-      contents: write  # Permissões para manipulação de conteúdo e tags
-      pull-requests: write  # Permissões para criar pull requests para versão
+      contents: write
+      pull-requests: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Release Please
-        uses: googleapis/release-please-action@v4  # Nova versão da ação
+        uses: googleapis/release-please-action@v4
         with:
           release-type: simple
           target-branch: main
-          github-token: ${{ secrets.GITHUB_TOKEN }}  # Usando o token com permissões adequadas
+          token: ${{ secrets.GITHUB_TOKEN }}  # Usando o token correto
