@@ -24,12 +24,14 @@ jobs:
         id: find
         run: |
           set -e
-          MAVEN_FILE=$(git ls-files | grep -E '/?pom\.xml$' | head -n1 || true)
-          GRADLE_FILE=$(git ls-files | grep -E '/?build\.gradle(\\.kts)?$' | head -n1 || true)
+          # Procurando o arquivo pom.xml ou build.gradle dentro da pasta Controle-Ponto
+          MAVEN_FILE=$(git ls-files | grep -E 'Controle-Ponto/pom\.xml$' | head -n1 || true)
+          GRADLE_FILE=$(git ls-files | grep -E 'Controle-Ponto/build\.gradle(\\.kts)?$' | head -n1 || true)
           
           echo "MAVEN_FILE=$MAVEN_FILE"
           echo "GRADLE_FILE=$GRADLE_FILE"
-          
+
+          # Verificando qual ferramenta usar (Maven ou Gradle)
           if [ -n "$MAVEN_FILE" ]; then
             DIR=$(dirname "$MAVEN_FILE")
             echo "tool=maven" >> $GITHUB_OUTPUT
@@ -38,6 +40,10 @@ jobs:
             DIR=$(dirname "$GRADLE_FILE")
             echo "tool=gradle" >> $GITHUB_OUTPUT
             echo "workdir=$DIR" >> $GITHUB_OUTPUT
+          else
+            echo "Nenhum arquivo Maven ou Gradle encontrado!"
+            exit 1  # Falha se não encontrar nenhum arquivo de build
+          fi
 
       - name: Run Maven/Gradle Build
         run: |
