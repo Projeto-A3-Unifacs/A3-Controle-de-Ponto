@@ -45,13 +45,10 @@ jobs:
             exit 1  # Falha se não encontrar nenhum arquivo de build
           fi
 
-      - name: Run Maven/Gradle Build
+      - name: Run Maven Build
         run: |
-          if [ "${{ steps.find.outputs.tool }}" == "maven" ]; then
-            mvn clean install
-          elif [ "${{ steps.find.outputs.tool }}" == "gradle" ]; then
-            gradle build
-          fi
+          cd Controle-Ponto  # Muda para o diretório onde o pom.xml está localizado
+          mvn clean install  # Executa o Maven no diretório correto
 
   # Etapa 2: Commitlint - Validação de Mensagens de Commit
   commitlint:
