@@ -1,0 +1,75 @@
+name: Release Semântico
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:   # Habilita o botão "Run workflow" no GitHub Web
+
+jobs:
+  semantic_release:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write   # necessário para criar tags, commits e releases
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # precisa do histórico completo para analisar commits
+
+      - name: Configurar Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # Gera versão semântica, tag e changelog
+      - name: Gerar versão semântica e changelog
+        id: changelog
+        uses: TriPSs/conventional-changelog-action@v5
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          tag-prefix: 'v'
+          output-file: 'CHANGELOG.md'
+          skip-commit: 'false'   # Commita update do CHANGELOG e version bump
+          skip-tag: 'false'      # Cria a tag automaticamente
+
+      # Se não houver commits relevantes, apenas loga
+      - name: Nenhuma versão gerada
+        if: steps.changelog.outputs.skipped == 'true'
+        run: echo "Nenhuma versão gerada. Commits não relevantes."
+
+      # As etapas abaixo só executam se a ação gerou uma versão
+      - name: Configurar Java (JDK 21)
+        if: steps.changelog.outputs.skipped != 'true'
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Cache do Maven
+        if: steps.changelog.outputs.skipped != 'true'
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Build JAR com Maven
+        if: steps.changelog.outputs.skipped != 'true'
+        working-directory: ./Controle-Ponto
+        run: mvn -B clean package
+
+      - name: Criar GitHub Release com JAR
+        if: steps.changelog.outputs.skipped != 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.changelog.outputs.tag }}
+          name: Release ${{ steps.changelog.outputs.tag }}
+          body: ${{ steps.changelog.outputs.clean_changelog }}
+          files: |
+            Controle-Ponto/target/Controle-Ponto-*.jar
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
