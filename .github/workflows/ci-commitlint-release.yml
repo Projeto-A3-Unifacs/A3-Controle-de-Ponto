@@ -1,4 +1,4 @@
-name: CI, Commitlint e Versionamento Semântico
+name: CI e Commitlint
 
 on:
   push:
@@ -7,84 +7,54 @@ on:
     branches: [ main, dev ]
 
 jobs:
-  # Etapa 1: CI - Build e Testes
-  ci:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pull-requests: write
-      actions: write
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        
-      - name: Set up Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '21'
-
-      - name: Find build file (pom.xml ou build.gradle)
-        id: find
-        run: |
-          set -e
-          MAVEN_FILE=$(git ls-files | grep -E 'Controle-Ponto/pom\.xml$' | head -n1 || true)
-          GRADLE_FILE=$(git ls-files | grep -E 'Controle-Ponto/build\.gradle(\\.kts)?$' | head -n1 || true)
-          
-          echo "MAVEN_FILE=$MAVEN_FILE"
-          echo "GRADLE_FILE=$GRADLE_FILE"
-
-          if [ -n "$MAVEN_FILE" ]; then
-            DIR=$(dirname "$MAVEN_FILE")
-            echo "tool=maven" >> $GITHUB_OUTPUT
-            echo "workdir=$DIR" >> $GITHUB_OUTPUT
-          elif [ -n "$GRADLE_FILE" ]; then
-            DIR=$(dirname "$GRADLE_FILE")
-            echo "tool=gradle" >> $GITHUB_OUTPUT
-            echo "workdir=$DIR" >> $GITHUB_OUTPUT
-          else
-            echo "Nenhum arquivo Maven ou Gradle encontrado!"
-            exit 1
-          fi
-
-      - name: Run Maven Build
-        run: |
-          cd Controle-Ponto
-          mvn clean install
-
-  # Etapa 2: Commitlint - Validação de Mensagens de Commit
+  # Etapa 1: Commitlint (validação das mensagens de commit)
   commitlint:
     runs-on: ubuntu-latest
-    needs: ci
-    permissions:
-      contents: read
     steps:
-      - name: Checkout
+      - name: Checkout do código
         uses: actions/checkout@v4
         with:
+          # precisa do histórico para o commitlint comparar commits
           fetch-depth: 0
-      
-      - name: Commitlint
-        uses: wagoid/commitlint-github-action@v6
-        with:
-          configFile: .commitlintrc.yml
-          commitDepth: 10
-          failOnWarnings: false
 
-  # Etapa 3: CD - Geração de Versão Semântica
-  cd:
+      - name: Configurar Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Instalar Commitlint
+        run: |
+          npm install @commitlint/cli @commitlint/config-conventional
+
+      - name: Rodar Commitlint
+        run: |
+          npx commitlint --from=HEAD~1 --to=HEAD
+        env:
+          HUSKY: 0
+
+  # Etapa 2: CI - Build e Testes Maven
+  ci:
     runs-on: ubuntu-latest
-    needs: commitlint
-    permissions:
-      contents: write
-      pull-requests: write
+    needs: commitlint  # Só roda se o commitlint passar
     steps:
-      - name: Checkout
+      - name: Checkout do código
         uses: actions/checkout@v4
 
-      - name: Release Please
-        uses: googleapis/release-please-action@v4
+      - name: Configurar Java
+        uses: actions/setup-java@v4
         with:
-          release-type: simple
-          target-branch: main
-          token: ${{ secrets.GITHUB_TOKEN }}  # Usando o token correto
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Cache do Maven
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Rodar testes Maven
+        working-directory: ./Controle-Ponto
+        run: mvn -B test
