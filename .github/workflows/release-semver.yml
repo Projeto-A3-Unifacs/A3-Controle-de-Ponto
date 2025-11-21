@@ -4,42 +4,43 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:   # Habilita o botão "Run workflow" no GitHub Web
 
 jobs:
   semantic_release:
     runs-on: ubuntu-latest
 
     permissions:
-      contents: write   # necessário para criar tag, commit e release
+      contents: write   # necessário para criar tags, commits e releases
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0   # precisa de histórico completo para ler os commits
+          fetch-depth: 0   # precisa do histórico completo para analisar commits
 
       - name: Configurar Node
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      # Gera versão semântica + tag + changelog com base em conventional commits
+      # Gera versão semântica, tag e changelog
       - name: Gerar versão semântica e changelog
         id: changelog
         uses: TriPSs/conventional-changelog-action@v5
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           tag-prefix: 'v'
-          output-file: 'CHANGELOG.md'   # mantém/atualiza arquivo CHANGELOG.md
-          skip-commit: 'false'          # faz commit do changelog + bump de versão
-          skip-tag: 'false'             # cria a tag automaticamente
+          output-file: 'CHANGELOG.md'
+          skip-commit: 'false'   # Commita update do CHANGELOG e version bump
+          skip-tag: 'false'      # Cria a tag automaticamente
 
-      # Se não houver commits que alterem versão, o job pode ser "skipped"
-      - name: Log quando nenhum release é gerado
+      # Se não houver commits relevantes, apenas loga
+      - name: Nenhuma versão gerada
         if: steps.changelog.outputs.skipped == 'true'
-        run: echo "Nenhuma versão gerada (commits não relevantes para versionamento semântico)."
+        run: echo "Nenhuma versão gerada. Commits não relevantes."
 
-      # A partir daqui, só roda se NÃO tiver sido pulado
+      # As etapas abaixo só executam se a ação gerou uma versão
       - name: Configurar Java (JDK 21)
         if: steps.changelog.outputs.skipped != 'true'
         uses: actions/setup-java@v4
