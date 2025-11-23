@@ -1,9 +1,5 @@
 # A3-Controle-de-Ponto
-Com base em tudo o que analisamos e corrigimos no seu projeto (estrutura das classes, banco de dados Supabase, testes unitários com Mockito e padrão de conexão), preparei uma apresentação completa em **Markdown**.
 
-Você pode usar esse texto no **README.md** do seu repositório GitHub ou como base para slides de apresentação para o professor.
-
------
 
 # 🕒 Sistema de Controle de Ponto e Frequência (A3)
 
