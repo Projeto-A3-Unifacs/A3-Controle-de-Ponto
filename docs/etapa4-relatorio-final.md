@@ -12,7 +12,7 @@ Apresentar o projeto de software, com foco em:
 - Nome do sistema: Controle de Ponto
 - Tecnologias:
   - Java + Maven
-  - Banco H2 / PostgreSQL (se aplicável)
+  - Banco de dados: PostgreSQL 
   - GitHub + GitHub Actions
 - Principais módulos:
   - Registro de ponto
