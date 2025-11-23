@@ -21,6 +21,7 @@ Diferentemente das etapas anteriores, esta seção apresenta uma estrutura **ger
 Foram aplicados dois níveis principais de testes:
 
 ### 3.2.1. Testes Unitários
+
 Os testes unitários têm como objetivo validar regras de negócio isoladamente, sem interação com banco de dados ou entrada do usuário. Entre os elementos avaliados estão:
 
 - Validação de entrada;
@@ -30,6 +31,7 @@ Os testes unitários têm como objetivo validar regras de negócio isoladamente,
 - Tratamento de erros e exceções.
 
 ### 3.2.2. Testes de Integração
+
 Os testes de integração verificam o fluxo completo passando por:
 
 - Entrada simulada do usuário;
@@ -44,8 +46,8 @@ Esses testes asseguram que todas as camadas operam de forma conjunta e correta.
 
 ## 3.3. Funcionalidades Testadas
 
-O projeto contém diversos cases no Menu e classes associadas a regras de negócio, persistência e operações do sistema.  
-Cada case, classe ou funcionalidade pode ser documentado nesta seção conforme for sendo testado.
+O projeto contém diversas funcionalidades no Menu e classes associadas a regras de negócio, persistência e operações do sistema.  
+Cada classe, serviço ou operação pode ser documentado nesta seção conforme for sendo testado.
 
 ---
 
@@ -53,16 +55,16 @@ Cada case, classe ou funcionalidade pode ser documentado nesta seção conforme 
 
 ### 3.4.1. Resultados dos Testes Unitários
 
-- As regras de negócio avaliadas apresentaram comportamento consistente conforme esperado;
-- Entradas inválidas foram adequadamente tratadas;
-- Métodos sensíveis não acionaram bancos de dados indevidamente;
+- As regras de negócio avaliadas apresentaram comportamento consistente conforme o esperado;  
+- Entradas inválidas foram adequadamente tratadas;  
+- Métodos sensíveis não acionaram bancos de dados indevidamente;  
 - Nenhuma exceção inesperada foi identificada durante a execução dos testes.
 
 ### 3.4.2. Resultados dos Testes de Integração
 
-- Os fluxos completos (Menu → Serviço → Repositório → Banco) funcionaram corretamente;
-- As inserções no banco refletiram a lógica da aplicação;
-- Não houve registros inválidos;
+- Os fluxos completos (Menu → Serviço → Banco) funcionaram corretamente;  
+- As inserções no banco refletiram a lógica da aplicação;  
+- Não houve registros inválidos;  
 - A execução do sistema em ambiente real demonstrou estabilidade e previsibilidade.
 
 ---
@@ -72,7 +74,7 @@ Cada case, classe ou funcionalidade pode ser documentado nesta seção conforme 
 ### 3.5.1. Cobertura de Testes
 - Cobertura funcional: **Alta**  
 - Cobertura de entradas inválidas: **Completa**  
-- Cobertura de fluxo ponta a ponta (E2E): **Completa**  
+- Cobertura de fluxo ponta a ponta (E2E): **Completa**
 
 ### 3.5.2. Confiabilidade e Integridade de Dados
 - Falhas de persistência detectadas: **0**
@@ -80,6 +82,7 @@ Cada case, classe ou funcionalidade pode ser documentado nesta seção conforme 
 - Estrutura e conteúdo das tabelas confirmam o comportamento esperado.
 
 ### 3.5.3. Qualidade no Processo (CI/CD)
+
 O pipeline de CI executa automaticamente:
 
 - `mvn test`;
@@ -117,13 +120,14 @@ A arquitetura do sistema permite:
 
 ---
 
-# 3.8. TÓPICO ESPECÍFICO PARA INSERÇÃO DOS TESTES DE CADA CASE
+# 3.8. TÓPICO ESPECÍFICO PARA INSERÇÃO DOS TESTES DE CADA FUNCIONALIDADE
 
-A seguir se encontram os testes já implementados e documentados.  
+A seguir se encontram os testes implementados e documentados, organizados por classe conforme encontrado no projeto.
 
 ---
 
-## 3.8.1. Testes do Case 3 — Registro de Justificativa de Atraso  
+# 3.8.1. Testes da funcionalidade `JustificativaAtraso`
+
 **Arquivos envolvidos:**  
 - `src/main/java/unifacs/a3/Menu.java`  
 - `src/main/java/unifacs/a3/JustificativaAtraso.java`  
@@ -134,70 +138,152 @@ A seguir se encontram os testes já implementados e documentados.
 
 ### ✔ O que foi testado
 
-#### A) Testes Unitários (classe JustificativaAtraso)
-- Mapeamento correto dos códigos de justificativa:  
-  - 1 → Falta Injustificada  
-  - 2 → Atestado  
-  - 3 → Saída Antecipada  
-  - 4 → Hora Extra  
-- Códigos inválidos retornam “Opção inválida.”  
-- Repositório acionado apenas para códigos válidos  
-- Mensagens corretas retornadas ao usuário  
-- Uso de Mockito para garantir isolamento das regras de negócio
+#### A) Testes Unitários
+- Mapeamento correto dos códigos 1–4  
+- Tratamento de códigos inválidos  
+- Mensagens de retorno  
+- Repositório acionado somente em opções válidas  
+- Uso de Mockito para isolar dependências
 
-#### B) Testes de Integração (fluxo real via Menu)
-- Entrada simulada pelo usuário (ByteArrayInputStream)  
-- Execução real do método `Menu.start()`  
-- Persistência real no PostgreSQL  
-- Consulta SQL via `PreparedStatement` para validação  
-- Verificação completa do fluxo Menu → Serviço → Banco
-
----
-
-### ✔ Cenários Válidos
-
-| Cenário | Entrada | Resultado Esperado |
-|--------|---------|--------------------|
-| C1 | 1 | Inserir "Falta Injustificada" |
-| C2 | 2 | Inserir "Atestado" |
-| C3 | 3 | Inserir "Saída Antecipada" |
-| C4 | 4 | Inserir "Hora Extra" |
-
----
-
-### ✔ Cenários Inválidos
-
-| Cenário | Entrada | Resultado Esperado |
-|---------|----------|--------------------|
-| I1 | 0 | "Opção inválida." + Nenhum insert |
-| I2 | 5 | "Opção inválida." + Nenhum insert |
-| I3 | Texto | Tratado como inválido + Nenhum insert |
+#### B) Testes de Integração
+- Execução real via Menu  
+- Entrada simulada  
+- Inserção real no PostgreSQL  
+- Consulta SQL para conferência
 
 ---
 
 ### ✔ Resultados Consolidados
-
-- Todos os testes unitários passaram com sucesso  
-- Todos os testes de integração confirmaram o fluxo correto  
-- Nenhuma inconsistência no banco  
-- Nenhum registro inválido foi encontrado  
-- A funcionalidade apresenta estabilidade e integridade completa
+- Cobertura completa da regra de negócio  
+- Integração validada  
+- Banco consistente  
 
 ---
 
-## 3.8.2. Testes do Case X — *[Nome da funcionalidade]*  
-*(Copie a estrutura do Case 3 acima ao adicionar novos cases)*
+# 3.8.2. Testes da Classe `UsuarioBD` (Cadastro, Autenticação e Persistência)
+
+**Arquivos envolvidos:**  
+- `src/main/java/unifacs/a3/UsuarioBD.java`  
+- `src/main/java/unifacs/a3/UsuarioRepository.java`  
+- `src/test/java/unifacs/a3/CadastraEVerifica.java`  
+- `src/test/java/unifacs/a3/UsuarioBDTest.java`  
+- `src/test/java/unifacs/a3/testIntegracao/CadastraTeste.java`  
+- `src/test/java/unifacs/a3/testIntegracao/VerifcaUserTest.java`
 
 ---
 
-## 3.9. Conclusão Geral da Etapa 3
+### ✔ O que foi testado
+
+#### A) Testes Unitários
+- Inserção no banco via JDBC  
+- Verificação de login  
+- Busca por email  
+- Tratamento de exceções  
+- Construção do objeto `Usuario` via ResultSet  
+
+#### B) Testes de Integração
+- Inserção real  
+- Autenticação real  
+- Leitura e comparação de dados no banco  
+
+---
+
+### ✔ Resultados Consolidados
+- Cadastro validado  
+- Login funcionando corretamente  
+- Persistência estável  
+
+---
+
+# 3.8.3. Testes da Classe `RecuperaSenhaService` (Recuperação de Senha)
+
+**Arquivos envolvidos:**  
+- `src/main/java/unifacs/a3/RecuperaSenhaService.java`  
+- `src/test/java/unifacs/a3/RecuperaSenhaServiceTest.java`  
+- `src/test/java/unifacs/a3/testIntegracao/RecuperaSenhaTest.java`
+
+---
+
+### ✔ O que foi testado
+
+#### A) Testes Unitários
+- Validação de email  
+- Geração de senha  
+- Atualização simulada  
+
+#### B) Testes de Integração
+- Atualização real no banco  
+- Consulta real  
+- Comparação antes/depois  
+
+---
+
+### ✔ Resultados Consolidados
+- Processo de recuperação funcionando  
+- Persistência garantida  
+
+---
+
+# 3.8.4. Testes da Classe `HorarioBD` (Entrada, Saída, Atrasos e Faltas)
+
+**Arquivos envolvidos:**  
+- `src/main/java/unifacs/a3/HorarioBD.java`  
+- `src/test/java/unifacs/a3/HorarioBDTest.java`  
+- `src/test/java/unifacs/a3/HorarioTest.java`
+
+---
+
+### ✔ O que foi testado
+
+#### A) Testes Unitários
+- Registro de entrada  
+- Impedir duplicidade  
+- Registro de saída  
+- Cálculo de atraso  
+- Faltas semanais  
+- Faltas mensais  
+
+---
+
+### ✔ Resultados Consolidados
+- Regras de horário funcionam corretamente  
+- Cálculos validados  
+- Nenhuma falha identificada  
+
+---
+
+# 3.8.5. Testes de Integração Gerais
+
+**Arquivos envolvidos:**  
+- `CadastraTeste.java`  
+- `VerifcaUserTest.java`  
+- `RecuperaSenhaTest.java`  
+- `JustificativaIntegracaoMenuTest.java`
+
+---
+
+### ✔ O que foi validado
+- Execução real do Menu  
+- Persistência completa no banco  
+- Inserções e consultas reais  
+- Fluxos integrados funcionando  
+
+---
+
+### ✔ Resultados Consolidados
+- Integrações funcionando corretamente  
+- Banco consistente  
+- Fluxos ponta a ponta validados  
+
+---
+
+# 3.9. Conclusão Geral da Etapa 3
 
 Esta etapa demonstrou que:
 
-- O sistema possui testes de unidade e integração bem organizados;  
-- As regras de negócio funcionam conforme especificado;  
-- O fluxo completo até o banco de dados está correto e estável;  
-- O processo de CI/CD reforça a qualidade do código;  
-- A estrutura está preparada para inclusão contínua de novos testes.
+- O sistema possui testes robustos e bem estruturados;  
+- As classes principais foram validadas em cenários reais;  
+- O banco de dados se comporta de forma estável;  
+- A integração CI/CD garante evolução segura.
 
-Esse conjunto de práticas garante que o sistema pode evoluir com segurança, mantendo qualidade e confiabilidade em todas as funcionalidades.
+O conjunto de práticas aplicadas assegura a qualidade, consistência e confiabilidade do sistema como um todo.
