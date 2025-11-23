@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
+import unifacs.a3.ConnectionManager;
 import unifacs.a3.Usuario;
 import unifacs.a3.UsuarioBD;
 import unifacs.a3.UsuarioRepository;
@@ -19,7 +20,7 @@ public class VerifcaUserTest {
 
     @BeforeAll
    public  void setupDatabase() throws SQLException {
-        connection = UsuarioBD.conexao_BD();
+        connection =  ConnectionManager.getConnection();
         repositorio = new UsuarioRepository(connection);
         deletarUsuarioDeTeste();
 
@@ -49,20 +50,29 @@ public class VerifcaUserTest {
 
     @Test
     void testeVerificaUsuario() throws Exception {
+    // Cria a conexão real com o banco
+    try (Connection conn = ConnectionManager.getConnection()) {
+
+        // Instancia o DAO com a conexão
+        UsuarioBD usuarioBD = new UsuarioBD(conn);
+
+        // Cria usuário de teste
         Usuario usuarioTeste = new Usuario();
         usuarioTeste.setNome("Nicole Silva");
         usuarioTeste.setSenha(456);
         usuarioTeste.setEmail("nica@gmail.com");
-        inserindoUsuarioDeTeste(usuarioTeste);
-        UsuarioBD usuarioBD = new UsuarioBD();
+
+        // Insere usuário no BD (pode ser um método auxiliar que usa o mesmo DAO)
+        usuarioBD.cadastra_Usuario(usuarioTeste);
+
+        // Verifica usuário usando o DAO com conexão
         Usuario usuarioVerificado = usuarioBD.verificaUser(usuarioTeste);
+
+        // Validações
         assert usuarioVerificado != null;
         assert usuarioVerificado.getNome().equals("Nicole Silva");
         assert usuarioVerificado.getSenha() == 456;
         assert usuarioVerificado.getEmail().equals("nica@gmail.com");
     }
-    public void fecharConexao() throws SQLException {
-        deletarUsuarioDeTeste();
-        connection.close();
-    }
+}
 }

@@ -8,8 +8,8 @@ public class RecuperaSenhaService {
     private final UsuarioRepository usuarioRepository;
 
     public RecuperaSenhaService(UsuarioRepository usuarioRepository)throws SQLException  {
-        Connection con = UsuarioBD.conexao_BD(); 
-        this.usuarioRepository = new UsuarioRepository(con);
+         
+        this.usuarioRepository = usuarioRepository;
         
     }
 

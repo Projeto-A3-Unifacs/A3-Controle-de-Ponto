@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
+import unifacs.a3.ConnectionManager;
 import unifacs.a3.Usuario;
 import unifacs.a3.UsuarioBD;
 import unifacs.a3.UsuarioRepository;
@@ -23,7 +24,7 @@ public class CadastraTeste {
 
     @BeforeAll
    public  void setupDatabase() throws SQLException {
-        connection = UsuarioBD.conexao_BD();
+        connection =ConnectionManager.getConnection();
         repositorio = new UsuarioRepository(connection);
         deletarUsuarioDeTeste();
 
@@ -55,25 +56,32 @@ public class CadastraTeste {
         return u;
     }
 
-
- @Test
+@Test
  void testeCadastroUsuario() throws Exception {
-    Usuario usuarioTeste = new Usuario();
+     
+
+        // Instancia o DAO passando a conexão
+        UsuarioBD usuarioBD = new UsuarioBD(connection);
+
+        // Cria usuário de teste
+        Usuario usuarioTeste = new Usuario();
         usuarioTeste.setNome("teste_integração");
         usuarioTeste.setSenha(123456);
         usuarioTeste.setEmail("teste_integracao@gmail.com");
 
-        new UsuarioBD().cadastra_Usuario(usuarioTeste);
+        // Chama o método de cadastro usando o DAO com conexão
+        usuarioBD.cadastra_Usuario(usuarioTeste);
 
+        // Busca para validar cadastro
         Usuario encontrado = buscarUsuarioPorEmail("teste_integracao@gmail.com");
 
+        // Validações
         Assertions.assertNotNull(encontrado);
         Assertions.assertEquals("teste_integração", encontrado.getNome());
         Assertions.assertEquals("teste_integracao@gmail.com", encontrado.getEmail());
-        Assertions.assertEquals(123456, encontrado.getSenha());  
-
-
- }
+        Assertions.assertEquals(123456, encontrado.getSenha());
+    
+}
     @AfterAll
    void fecharConexao() throws SQLException {
        

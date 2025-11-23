@@ -6,85 +6,94 @@ import java.util.Scanner;
 
 public class Menu {
 
-  public static void start(Usuario usuario) throws Exception {
-    Scanner scan = new Scanner(System.in);
-    
-            // Menu inicial
-            System.out.println("Selecione uma opção:");
-            System.out.println("1 - Registrar ponto");
-            System.out.println("2 - Cadastrar Funcionário");
-            System.out.println("3 - Registrar justificativa de atraso");
-            System.out.println("4 - Verificar faltas");
-            System.out.println("5 - Verificar atrasos");
-            int opcao = scan.nextInt();
+    // AGORA RECEBE A CONEXÃO (con) COMO PARÂMETRO
+    public static void start(Usuario usuario, Connection con) {
+        Scanner scan = new Scanner(System.in);
+        
+        // Instancia os objetos de banco UMA VEZ só, usando a conexão recebida
+        try {
+            UsuarioBD usuarioBD = new UsuarioBD(con);
+            HorarioBD horarioBD = new HorarioBD(con);
+            JustificativaBD justificativaBD = new JustificativaBD(con); // Instancia aqui para reutilizar
+            
+            boolean continuar = true;
 
-            switch (opcao) {
+            // O LOOP FICA AQUI DENTRO
+            while (continuar) {
+                System.out.println("\n--- MENU PRINCIPAL ---");
+                System.out.println("Selecione uma opção:");
+                System.out.println("1 - Registrar ponto");
+                System.out.println("2 - Cadastrar Funcionário");
+                System.out.println("3 - Registrar justificativa de atraso");
+                System.out.println("4 - Verificar faltas");
+                System.out.println("5 - Verificar atrasos");
+                System.out.println("0 - Sair"); // Opção de sair
+                
+                int opcao = scan.nextInt();
 
-                // ------------------------- CASE 1: Registrar ponto -------------------------
-                case 1:
-                    System.out.println("1 - Entrada\n2 - Saída");
-                    int resposta = scan.nextInt();
-
-                    if (resposta == 1) {
-                        LocalDateTime entrada = LocalDateTime.now();
-                        boolean registrado = HorarioBD.registra_Hora(entrada, usuario.getId());
-
-                        if (registrado) {
-                            System.out.println("Sua entrada foi registrada com sucesso");
+                switch (opcao) {
+                    case 1:
+                        System.out.println("1 - Entrada\n2 - Saída");
+                        int resposta = scan.nextInt();
+                        if (resposta == 1) {
+                            LocalDateTime entrada = LocalDateTime.now();
+                            if (horarioBD.registra_Hora(entrada, usuario.getId())) {
+                                System.out.println("Entrada registrada!");
+                            }
+                        } else {
+                            horarioBD.registra_Saida(usuario.getId());
+                            System.out.println("Saída registrada!");
                         }
-                    } else {
-                        HorarioBD.registra_Saida(usuario.getId());
-                        System.out.println("Sua saída foi registrada com sucesso");
-                    }
-                    break;
+                        break;
 
-                // ------------------------- CASE 2: Cadastrar funcionário -------------------------
-                case 2:
-                  UsuarioBD UsuarioBD = new UsuarioBD();
-                    System.out.println("Digite o nome do funcionário:");
-                    scan.nextLine();  // Consumir a nova linha pendente
-                    String novoNome =scan.nextLine();
-                     System.out.println("Digite o email do funcionário:");
-                    String novoEmail = scan.nextLine();
-                   
-                    System.out.println("Crie uma nova senha:");
-                    int novaSenha = scan.nextInt();
+                    case 2:
+                        System.out.println("Nome:");
+                        scan.nextLine(); 
+                        String novoNome = scan.nextLine();
+                        System.out.println("Email:");
+                        String novoEmail = scan.nextLine();
+                        System.out.println("Senha (numérica):");
+                        int novaSenha = scan.nextInt();
 
-                    Usuario novoUsuario = new Usuario();
-                    novoUsuario.setNome(novoNome);
-                    novoUsuario.setSenha(novaSenha);
-                    novoUsuario.setEmail(novoEmail);
-                    UsuarioBD.cadastra_Usuario(novoUsuario);
-                    break;
+                        Usuario novoUsuario = new Usuario();
+                        novoUsuario.setNome(novoNome);
+                        novoUsuario.setEmail(novoEmail);
+                        novoUsuario.setSenha(novaSenha);
 
-                // ------------------------- CASE 3: Justificar atraso -------------------------
-                case 3:
-                JustificativaAtraso justificativaAtraso = new JustificativaAtraso(new JustificativaBD());
-                    System.out.println("Selecione o código de justificativa:");
-                    System.out.println("1 - Falta Injustificada");
-                    System.out.println("2 - Atestado");
-                    System.out.println("3 - Saída Antecipada");
-                    System.out.println("4 - Hora Extra");
-                    int justificativa = scan.nextInt(); 
+                        usuarioBD.cadastra_Usuario(novoUsuario);
+                        break;
 
-                    String resultado = justificativaAtraso.registrarJustificativa(usuario.getId(), justificativa);
-                    System.out.println(resultado);
-                    break;
+                    case 3:
+                        // Passa o objeto BD já criado
+                        JustificativaAtraso justificativaAtraso = new JustificativaAtraso(justificativaBD);
+                        System.out.println("Código: 1-Falta, 2-Atestado, 3-Saída, 4-Hora Extra");
+                        int just = scan.nextInt();
+                        System.out.println(justificativaAtraso.registrarJustificativa(usuario.getId(), just));
+                        break;
 
-                // ------------------------- CASE 4: Verificar faltas -------------------------
-                case 4:
-                    System.out.println("Faltas na semana: " + HorarioBD.faltasSemanais(usuario.getId()));
-                    System.out.println("Faltas no mês: " + HorarioBD.faltasMensais(usuario.getId()));
-                    break;
+                    case 4:
+                        System.out.println("Faltas semana: " + horarioBD.faltasSemanais(usuario.getId()));
+                        System.out.println("Faltas mês: " + horarioBD.faltasMensais(usuario.getId()));
+                        break;
 
-                // ------------------------- CASE 5: Verificar Atrasos -------------------------
-                case 5:
-                    System.out.println("Verificando atrasos...");
-                    HorarioBD.verifica_atraso(usuario.getId());
-                    break;
-            }
-  }
+                    case 5:
+                        horarioBD.verifica_atraso(usuario.getId());
+                        break;
+                        
+                    case 0:
+                        continuar = false;
+                        System.out.println("Saindo...");
+                        break;
+                        
+                    default:
+                        System.out.println("Opção inválida!");
+                }
+            } // Fim do While
 
-
-
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Erro no menu: " + e.getMessage());
+        }
+        // NÃO FECHAMOS A CONEXÃO AQUI (quem fecha é o App.java)
+    }
 }

@@ -14,10 +14,14 @@ import java.util.List;
 
 public class HorarioBD {
 
+  private Connection connect;
 
+   public HorarioBD(Connection connect) throws Exception {
+        this.connect = connect;
+    }
 
-     public static boolean registra_Hora(LocalDateTime entrada, int usuario_id) throws Exception {
-        Connection connect =UsuarioBD.conexao_BD();
+     public  boolean registra_Hora(LocalDateTime entrada, int usuario_id) throws Exception {
+       
         boolean horario_registrado = false;
 
         PreparedStatement ps = connect.prepareStatement(
@@ -32,10 +36,10 @@ public class HorarioBD {
 
 
   // Registra ponto de saída para um usuário específico
-public static void registra_Saida(int usuarioId) throws Exception {
-    Connection connect = UsuarioBD.conexao_BD();
+public  void registra_Saida(int usuarioId) throws Exception {
     
-    try {
+    
+   
         // Busca o último registro sem saída para esse usuário
         String sqlBusca = "SELECT id FROM horarios WHERE saida IS NULL AND usuario_id = ? ORDER BY id DESC LIMIT 1";
         PreparedStatement stmtBusca = connect.prepareStatement(sqlBusca);
@@ -60,20 +64,19 @@ public static void registra_Saida(int usuarioId) throws Exception {
 
         rs.close();
         stmtBusca.close();
-    } finally {
-        connect.close();
-    }
+   
+    
 }
 
 
-     public static int faltasSemanais(int usuarioId) throws Exception {
-        Connection con = UsuarioBD.conexao_BD();
+     public  int faltasSemanais(int usuarioId) throws Exception {
+       
 
         LocalDate hoje = LocalDate.now();
         LocalDate semanaPassada = hoje.minusDays(7);
 
         String sql = "SELECT DISTINCT DATE(entrada) as dia FROM horarios WHERE usuario_id = ? AND entrada BETWEEN ? AND ?";
-        PreparedStatement ps = con.prepareStatement(sql);
+        PreparedStatement ps = connect.prepareStatement(sql);
 
         ps.setInt(1, usuarioId);
         ps.setObject(2, semanaPassada.atStartOfDay());
@@ -99,14 +102,14 @@ public static void registra_Saida(int usuarioId) throws Exception {
         return faltas;
     }
 
-    public static int faltasMensais(int usuarioId) throws Exception {
-        Connection con = UsuarioBD.conexao_BD();
+    public  int faltasMensais(int usuarioId) throws Exception {
+      
 
         LocalDate hoje = LocalDate.now();
         LocalDate primeiroDia = hoje.withDayOfMonth(1);
 
         String sql = "SELECT DISTINCT DATE(entrada) as dia FROM horarios WHERE usuario_id = ? AND entrada BETWEEN ? AND ?";
-        PreparedStatement ps = con.prepareStatement(sql);
+        PreparedStatement ps = connect.prepareStatement(sql);
         ps.setInt(1, usuarioId);
         ps.setObject(2, primeiroDia.atStartOfDay());
         ps.setObject(3, hoje.atTime(23, 59, 59));
@@ -133,7 +136,7 @@ public static void registra_Saida(int usuarioId) throws Exception {
 
 
     
-     public static List<LocalDate> verifica_atraso(int id) throws Exception {
+     public  List<LocalDate> verifica_atraso(int id) throws Exception {
         List<LocalDateTime> entradas = buscarEntradasPorUsuario(id);
         List<LocalDate> atrasos = new ArrayList<>();
 
@@ -149,8 +152,8 @@ public static void registra_Saida(int usuarioId) throws Exception {
     }
 
     // Método auxiliar: consulta o BD (ou pode ser substituído por dados falsos no teste)
-    public static List<LocalDateTime> buscarEntradasPorUsuario(int id) throws Exception {
-        Connection connect = UsuarioBD.conexao_BD();
+    public  List<LocalDateTime> buscarEntradasPorUsuario(int id) throws Exception {
+        
         Statement stmt = connect.createStatement();
 
         ResultSet rs = stmt.executeQuery(
@@ -164,7 +167,7 @@ public static void registra_Saida(int usuarioId) throws Exception {
 
         rs.close();
         stmt.close();
-        connect.close();
+       
 
         return entradas;
     }
