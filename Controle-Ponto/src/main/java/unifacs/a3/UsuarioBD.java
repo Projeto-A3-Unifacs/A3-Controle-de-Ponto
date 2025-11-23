@@ -9,20 +9,15 @@ import java.util.Scanner;
 
 public class UsuarioBD {
     
-     public static Connection conexao_BD()  {
-        String url = "jdbc:postgresql://aws-1-us-east-1.pooler.supabase.com:6543/postgres?sslmode=require";
-        String user = "postgres.iczuamsiqqdvifexshbf";
-        String password = "miniProject25@";
-       try {
-            return DriverManager.getConnection(url, user, password);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return null; // ou lance a exceção para tratar fora
-        }
+   private Connection con;
+    public UsuarioBD(Connection con) {
+        this.con = con;
     }
+    
+    
 //cadastro de usuário
     public  boolean cadastra_Usuario(Usuario usuario) throws Exception {
-        Connection con = conexao_BD();
+       
                     PreparedStatement ps = con.prepareStatement(
                         "INSERT INTO usuario (nome, senha,email) VALUES (?, ?,?)"
                     );
@@ -38,7 +33,7 @@ public class UsuarioBD {
 
   //verificação de usuário
     public  Usuario verificaUser(Usuario usuario) throws Exception {
-        Connection con = conexao_BD();
+        
 
         String sql = "SELECT id, nome, email, senha FROM usuario WHERE nome = ? AND senha = ?";
         PreparedStatement ps = con.prepareStatement(sql);
@@ -58,9 +53,7 @@ public class UsuarioBD {
             usuario.setSenha(rs.getInt("senha"));
         }
 
-        rs.close();
-        ps.close();
-        con.close();
+      
 
         return usuario;
     }

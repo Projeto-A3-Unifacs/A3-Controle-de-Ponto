@@ -16,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
+import unifacs.a3.ConnectionManager;
 import unifacs.a3.UsuarioBD;
 import unifacs.a3.UsuarioRepository;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -26,7 +27,7 @@ public class RecuperaSenhaTest {
 
     @BeforeAll
     void setupDatabase() throws SQLException {
-        connection = UsuarioBD.conexao_BD();
+        connection =  ConnectionManager.getConnection();
         repositorio = new UsuarioRepository(connection);
 
     }

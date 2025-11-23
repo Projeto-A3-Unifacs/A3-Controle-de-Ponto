@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
+import unifacs.a3.ConnectionManager;
 import unifacs.a3.Usuario;
 import unifacs.a3.UsuarioBD;
 import unifacs.a3.UsuarioRepository;
@@ -23,7 +24,7 @@ public class CadastraTeste {
 
     @BeforeAll
    public  void setupDatabase() throws SQLException {
-        connection = UsuarioBD.conexao_BD();
+        connection =ConnectionManager.getConnection();
         repositorio = new UsuarioRepository(connection);
         deletarUsuarioDeTeste();
 
@@ -31,22 +32,22 @@ public class CadastraTeste {
 
 
   
-private void deletarUsuarioDeTeste() throws SQLException {
-    PreparedStatement ps = connection.prepareStatement(
-        "DELETE FROM usuario WHERE email = ? AND nome = ? AND senha = ?"
-    );
-    ps.setString(1, "teste_integracao@gmail.com");
-    ps.setString(2, "teste_integração");
-    ps.setInt(3, 123456);
-    ps.executeUpdate();
-}
+    private void deletarUsuarioDeTeste() throws SQLException {
+        PreparedStatement ps = connection.prepareStatement(
+            "DELETE FROM usuario WHERE email = ? AND nome = ? AND senha = ?"
+        );
+        ps.setString(1, "teste_integracao@gmail.com");
+        ps.setString(2, "teste_integração");
+        ps.setInt(3, 123456);
+        ps.executeUpdate();
+    }
 
-private Usuario buscarUsuarioPorEmail(String email) throws SQLException {
-    PreparedStatement ps = connection.prepareStatement("SELECT * FROM usuario WHERE email = ?");
-    ps.setString(1, email);
-    ResultSet rs = ps.executeQuery();
+    private Usuario buscarUsuarioPorEmail(String email) throws SQLException {
+        PreparedStatement ps = connection.prepareStatement("SELECT * FROM usuario WHERE email = ?");
+        ps.setString(1, email);
+        ResultSet rs = ps.executeQuery();
 
-    if (!rs.next()) return null;
+        if (!rs.next()) return null;
 
         Usuario u = new Usuario();
         u.setNome(rs.getString("nome"));
@@ -55,25 +56,32 @@ private Usuario buscarUsuarioPorEmail(String email) throws SQLException {
         return u;
     }
 
-
- @Test
+@Test
  void testeCadastroUsuario() throws Exception {
-    Usuario usuarioTeste = new Usuario();
+     
+
+        // Instancia o DAO passando a conexão
+        UsuarioBD usuarioBD = new UsuarioBD(connection);
+
+        // Cria usuário de teste
+        Usuario usuarioTeste = new Usuario();
         usuarioTeste.setNome("teste_integração");
         usuarioTeste.setSenha(123456);
         usuarioTeste.setEmail("teste_integracao@gmail.com");
 
-        new UsuarioBD().cadastra_Usuario(usuarioTeste);
+        // Chama o método de cadastro usando o DAO com conexão
+        usuarioBD.cadastra_Usuario(usuarioTeste);
 
+        // Busca para validar cadastro
         Usuario encontrado = buscarUsuarioPorEmail("teste_integracao@gmail.com");
 
+        // Validações
         Assertions.assertNotNull(encontrado);
         Assertions.assertEquals("teste_integração", encontrado.getNome());
         Assertions.assertEquals("teste_integracao@gmail.com", encontrado.getEmail());
-        Assertions.assertEquals(123456, encontrado.getSenha());  
-
-
- }
+        Assertions.assertEquals(123456, encontrado.getSenha());
+    
+}
     @AfterAll
    void fecharConexao() throws SQLException {
        

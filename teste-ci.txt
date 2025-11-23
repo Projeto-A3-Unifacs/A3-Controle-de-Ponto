@@ -1,3 +1,7 @@
 Teste CI
 Reexecutando teste CI
 Validação commitlint ok
+<<<<<<< HEAD
+=======
+Teste commitlint
+>>>>>>> main

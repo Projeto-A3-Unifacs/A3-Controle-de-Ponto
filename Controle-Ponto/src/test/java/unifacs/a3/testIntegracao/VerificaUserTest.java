@@ -1,4 +1,4 @@
-xpackage unifacs.a3.testIntegracao;
+package unifacs.a3.testIntegracao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
+import unifacs.a3.ConnectionManager;
 import unifacs.a3.Usuario;
 import unifacs.a3.UsuarioBD;
 import unifacs.a3.UsuarioRepository;
@@ -19,7 +20,7 @@ public class VerificaUserTest {
 
     @BeforeAll
    public  void setupDatabase() throws SQLException {
-        connection = UsuarioBD.conexao_BD();
+        connection = ConnectionManager.getConnection();
         repositorio = new UsuarioRepository(connection);
         deletarUsuarioDeTeste();
 
@@ -54,7 +55,7 @@ public class VerificaUserTest {
         usuarioTeste.setSenha(456);
         usuarioTeste.setEmail("nica@gmail.com");
         inserindoUsuarioDeTeste(usuarioTeste);
-        UsuarioBD usuarioBD = new UsuarioBD();
+        UsuarioBD usuarioBD = new UsuarioBD(connection);
         Usuario usuarioVerificado = usuarioBD.verificaUser(usuarioTeste);
         assert usuarioVerificado != null;
         assert usuarioVerificado.getNome().equals("Nicole Silva");

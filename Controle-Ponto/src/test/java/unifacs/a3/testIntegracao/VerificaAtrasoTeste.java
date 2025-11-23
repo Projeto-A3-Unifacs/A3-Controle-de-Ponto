@@ -15,6 +15,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
+import unifacs.a3.ConnectionManager;
 import unifacs.a3.HorarioBD;
 import unifacs.a3.Usuario;
 import unifacs.a3.UsuarioBD;
@@ -27,7 +28,7 @@ public class VerificaAtrasoTeste {
 
     @BeforeAll
     public void setup() throws Exception {
-        connection = UsuarioBD.conexao_BD();
+        connection = ConnectionManager.getConnection();
         limparRegistros();
         criarUsuarioDeTeste();
     }
@@ -53,7 +54,7 @@ public class VerificaAtrasoTeste {
         u.setSenha(123456);
 
         // cadastra no banco
-        new UsuarioBD().cadastra_Usuario(u);
+        new UsuarioBD(connection).cadastra_Usuario(u);
 
         // buscar ID gerado
         PreparedStatement ps = connection.prepareStatement("SELECT id FROM usuario WHERE email = ?");
@@ -82,7 +83,7 @@ public class VerificaAtrasoTeste {
 
     @Test
     void testeVerificarAtrasos() throws Exception {
-
+HorarioBD HorarioBD = new HorarioBD(connection);
         // Entrada sem atraso: 07:55
         inserirEntrada(LocalDateTime.of(2025, 1, 10, 7, 55));
 

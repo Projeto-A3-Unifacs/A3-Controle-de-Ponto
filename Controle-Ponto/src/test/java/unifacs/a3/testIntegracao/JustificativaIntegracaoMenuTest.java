@@ -1,17 +1,25 @@
 package unifacs.a3.testIntegracao;
 
+import org.checkerframework.checker.units.qual.C;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
+import unifacs.a3.ConnectionManager;
 import unifacs.a3.Menu;
 import unifacs.a3.Usuario;
 import unifacs.a3.UsuarioBD;
+import unifacs.a3.UsuarioRepository;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
+import org.junit.jupiter.api.TestInstance;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -20,7 +28,16 @@ import static org.junit.jupiter.api.Assertions.*;
  * Este teste simula a interação do usuário para registrar uma justificativa
  * de atraso, passando pela interface do Menu e verificando a gravação no banco.
  */
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class JustificativaIntegracaoMenuTest {
+
+    private Connection con;
+
+
+    @BeforeAll
+   public  void setupDatabase() throws SQLException {
+        con =ConnectionManager.getConnection();
+       }
 
     @Test
     void deveRegistrarJustificativaPassandoPeloMenuCase3() throws Exception {
@@ -45,7 +62,7 @@ public class JustificativaIntegracaoMenuTest {
             System.setIn(new ByteArrayInputStream(entradaSimulada.getBytes()));
 
             // 5) Executa o Menu, que vai ler as opções como se fosse o usuário digitando
-            Menu.start(usuario);
+            Menu.start(usuario,con);
 
         } finally {
             // 6) Restaura a entrada padrão
@@ -53,17 +70,18 @@ public class JustificativaIntegracaoMenuTest {
         }
 
         // 7) Verifica se a justificativa foi registrada no banco para esse usuário
-        try (Connection con = UsuarioBD.conexao_BD();
+     
              PreparedStatement ps = con.prepareStatement(
                      "SELECT tipo FROM justificativa WHERE usuario_id = ? ORDER BY id DESC LIMIT 1"
-             )) {
+             );
 
             ps.setInt(1, usuarioId);
             ResultSet rs = ps.executeQuery();
 
             assertTrue(rs.next(), "Nenhuma justificativa foi encontrada no banco para o usuário!");
             assertEquals("Atestado", rs.getString("tipo"));
-        }
+            
+        
     }
 
     // ========================================================================
@@ -75,10 +93,10 @@ public class JustificativaIntegracaoMenuTest {
      * e retorna o ID gerado automaticamente.
      */
     private int criarUsuarioDeTeste() throws Exception {
-        try (Connection con = UsuarioBD.conexao_BD();
+     
              PreparedStatement ps = con.prepareStatement(
                      "INSERT INTO usuario(nome, email, senha) VALUES (?, ?, ?) RETURNING id"
-             )) {
+             );
 
             ps.setString(1, "Usuario Teste");
             ps.setString(2, "teste_" + System.currentTimeMillis() + "@teste.com");
@@ -87,7 +105,8 @@ public class JustificativaIntegracaoMenuTest {
             ResultSet rs = ps.executeQuery();
             rs.next();
             return rs.getInt("id");
-        }
+            
+        
     }
 
     /**
@@ -95,13 +114,19 @@ public class JustificativaIntegracaoMenuTest {
      * garantindo que o teste comece com um estado limpo.
      */
     private void limparJustificativasUsuario(int usuarioId) throws Exception {
-        try (Connection con = UsuarioBD.conexao_BD();
+        
              PreparedStatement ps = con.prepareStatement(
-                     "DELETE FROM justificativa WHERE usuario_id = ?"
-             )) {
+                     "DELETE FROM justificativa WHERE usuario_id = ?");
 
             ps.setInt(1, usuarioId);
             ps.executeUpdate();
-        }
+        
+    }
+
+    @AfterAll
+   void fecharConexao() throws SQLException {
+       
+      
+        con.close();
     }
 }

@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
+import org.checkerframework.checker.units.qual.h;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -13,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
 import unifacs.a3.UsuarioBD;
+import unifacs.a3.ConnectionManager;
 import unifacs.a3.HorarioBD;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -23,7 +25,7 @@ public class RegistroSaidaTeste {
 
     @BeforeAll
     public void setup() throws Exception {
-        connection = UsuarioBD.conexao_BD();
+        connection = ConnectionManager.getConnection();
         limparRegistros();
         inserirEntradaSemSaida();
     }
@@ -55,6 +57,7 @@ public class RegistroSaidaTeste {
 
     @Test
     void testeRegistroSaida() throws Exception {
+        HorarioBD HorarioBD = new HorarioBD(connection);
         HorarioBD.registra_Saida(usuarioIdTeste);
 
         ResultSet rs = buscarRegistroAberto();

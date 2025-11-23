@@ -5,8 +5,8 @@ import java.util.Scanner;
 
 public class App {
 
-    public static void main(String[] args) throws Exception {
-
+    public static void main(String[] args)   {
+  try (Connection con = ConnectionManager.getConnection()) { 
         int alternativa = 0;
         Scanner scan = new Scanner(System.in);
 
@@ -19,11 +19,11 @@ public class App {
         int senha = scan.nextInt();
         user.setSenha(senha);
         // Verifica se o usuário existe no BD
-        UsuarioBD usuarioBD = new UsuarioBD();
+        UsuarioBD usuarioBD = new UsuarioBD(con);
         Usuario usuario =usuarioBD.verificaUser(user);
    //INICIO MENU
         if (usuario != null && usuario.getId() > 0) {
-       Menu.start(usuario);
+       Menu.start(usuario,con);
 
         } else {
             System.out.println("Usuário não cadastrado");
@@ -37,16 +37,22 @@ public class App {
                System.out.println("Digite sua nova senha:");
                int novaSenha = scan.nextInt();
 
-             try (Connection con = UsuarioBD.conexao_BD()) { 
+             
                       UsuarioRepository repo = new UsuarioRepository(con);
                        RecuperaSenhaService service = new RecuperaSenhaService(repo);
                        System.out.println(service.recuperarSenha(email, novaSenha));
-           } catch (Exception e) {
-              e.printStackTrace();
-                 }
+
+                     
+           
             }
         }
 
-        scan.close();
-    }
+          scan.close(); 
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+       
+  }
 }
