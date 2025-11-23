@@ -1,4 +1,4 @@
-package unifacs.a3.testIntegracao;
+xpackage unifacs.a3.testIntegracao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -13,7 +13,7 @@ import unifacs.a3.UsuarioBD;
 import unifacs.a3.UsuarioRepository;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class VerifcaUserTest {
+public class VerificaUserTest {
  private Connection connection;
  private UsuarioRepository repositorio;
 

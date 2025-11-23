@@ -31,22 +31,22 @@ public class CadastraTeste {
 
 
   
-    private void deletarUsuarioDeTeste() throws SQLException {
-        PreparedStatement ps = connection.prepareStatement(
-            "DELETE FROM usuario WHERE email = ? AND nome = ? AND senha = ?"
-        );
-        ps.setString(1, "teste_integracao@gmail.com");
-        ps.setString(2, "teste_integração");
-        ps.setInt(3, 123456);
-        ps.executeUpdate();
-    }
+private void deletarUsuarioDeTeste() throws SQLException {
+    PreparedStatement ps = connection.prepareStatement(
+        "DELETE FROM usuario WHERE email = ? AND nome = ? AND senha = ?"
+    );
+    ps.setString(1, "teste_integracao@gmail.com");
+    ps.setString(2, "teste_integração");
+    ps.setInt(3, 123456);
+    ps.executeUpdate();
+}
 
-    private Usuario buscarUsuarioPorEmail(String email) throws SQLException {
-        PreparedStatement ps = connection.prepareStatement("SELECT * FROM usuario WHERE email = ?");
-        ps.setString(1, email);
-        ResultSet rs = ps.executeQuery();
+private Usuario buscarUsuarioPorEmail(String email) throws SQLException {
+    PreparedStatement ps = connection.prepareStatement("SELECT * FROM usuario WHERE email = ?");
+    ps.setString(1, email);
+    ResultSet rs = ps.executeQuery();
 
-        if (!rs.next()) return null;
+    if (!rs.next()) return null;
 
         Usuario u = new Usuario();
         u.setNome(rs.getString("nome"));
