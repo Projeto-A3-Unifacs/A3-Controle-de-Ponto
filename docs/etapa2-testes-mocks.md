@@ -111,10 +111,10 @@ Além do case 3, foram testados:
 Todos os cases foram testados:
 
 - Case 1 – Registrar ponto  
-- Case 2 – Consultar atrasos/faltas  
+- Case 2 – Cadastrar Funcionário
 - Case 3 – Registrar justificativa de atraso  
-- Case 4 – Recuperar senha  
-- Case 5 – Encerrar sessão  
+- Case 4 – Verificar faltas  
+- Case 5 – Verificar atrasos 
 
 ### 2.5.4. Serviços auxiliares
 
