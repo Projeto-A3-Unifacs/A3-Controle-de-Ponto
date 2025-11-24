@@ -163,8 +163,7 @@ A seguir se encontram os testes implementados e documentados, organizados por cl
 # 3.8.2. Testes da Classe `UsuarioBD` (Cadastro, Autenticação e Persistência)
 
 **Arquivos envolvidos:**  
-- `src/main/java/unifacs/a3/UsuarioBD.java`  
-- `src/main/java/unifacs/a3/UsuarioRepository.java`  
+- `src/main/java/unifacs/a3/UsuarioBD.java`    
 - `src/test/java/unifacs/a3/CadastraEVerifica.java`  
 - `src/test/java/unifacs/a3/UsuarioBDTest.java`  
 - `src/test/java/unifacs/a3/testIntegracao/CadastraTeste.java`  
@@ -177,7 +176,7 @@ A seguir se encontram os testes implementados e documentados, organizados por cl
 #### A) Testes Unitários
 - Inserção no banco via JDBC  
 - Verificação de login  
-- Busca por email  
+- Cadastro de Usuário 
 - Tratamento de exceções  
 - Construção do objeto `Usuario` via ResultSet  
 
@@ -198,7 +197,8 @@ A seguir se encontram os testes implementados e documentados, organizados por cl
 # 3.8.3. Testes da Classe `RecuperaSenhaService` (Recuperação de Senha)
 
 **Arquivos envolvidos:**  
-- `src/main/java/unifacs/a3/RecuperaSenhaService.java`  
+- `src/main/java/unifacs/a3/RecuperaSenhaService.java`
+- `src/main/java/unifacs/a3/UsuarioRepository.java`
 - `src/test/java/unifacs/a3/RecuperaSenhaServiceTest.java`  
 - `src/test/java/unifacs/a3/testIntegracao/RecuperaSenhaTest.java`
 
@@ -229,7 +229,10 @@ A seguir se encontram os testes implementados e documentados, organizados por cl
 **Arquivos envolvidos:**  
 - `src/main/java/unifacs/a3/HorarioBD.java`  
 - `src/test/java/unifacs/a3/HorarioBDTest.java`  
-- `src/test/java/unifacs/a3/HorarioTest.java`
+- `src/test/java/unifacs/a3/HorarioTestHelper.java`
+- `src\test\java\unifacs\a3\testIntegracao\RegistroSaidaTeste.java`
+- `src\test\java\unifacs\a3\testIntegracao\RegistroEntradaTeste.java`
+- `src\test\java\unifacs\a3\testIntegracao\VerificaAtrasoTeste.java`
 
 ---
 
@@ -241,8 +244,11 @@ A seguir se encontram os testes implementados e documentados, organizados por cl
 - Registro de saída  
 - Cálculo de atraso  
 - Faltas semanais  
-- Faltas mensais  
-
+- Faltas mensais
+  
+#### B) Testes de Integração
+- Atualização real no banco  
+- Consulta real
 ---
 
 ### ✔ Resultados Consolidados
@@ -259,6 +265,9 @@ A seguir se encontram os testes implementados e documentados, organizados por cl
 - `VerifcaUserTest.java`  
 - `RecuperaSenhaTest.java`  
 - `JustificativaIntegracaoMenuTest.java`
+- `RegistroSaidaTeste.java`
+- `RegistroEntradaTeste.java`
+- `VerificaAtrasoTeste.java`
 
 ---
 
