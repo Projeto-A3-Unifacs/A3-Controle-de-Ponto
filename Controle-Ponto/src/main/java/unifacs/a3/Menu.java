@@ -80,6 +80,25 @@ public class Menu {
                         horarioBD.verifica_atraso(usuario.getId());
                         break;
                         
+                        case 6:
+    // Usa a MESMA conexão recebida pelo Menu, igual aos outros BD
+    FaltaBD faltaBD = new FaltaBD(con);
+    JustificativaFalta justificativaFalta = new JustificativaFalta(faltaBD);
+
+    System.out.println("Selecione o código de justificativa para FALTA:");
+    System.out.println("1 - Falecimento");
+    System.out.println("2 - Casamento");
+    System.out.println("3 - Nascimento ou Adoção");
+    System.out.println("4 - Doação de Sangue");
+    System.out.println("5 - Comparecimento em Juízo");
+
+    int codigo = scan.nextInt();
+
+    String respostaFalta = justificativaFalta.registrarJustificativa(usuario.getId(), codigo);
+    System.out.println(respostaFalta);
+    break;
+
+                        
                     case 0:
                         continuar = false;
                         System.out.println("Saindo...");
