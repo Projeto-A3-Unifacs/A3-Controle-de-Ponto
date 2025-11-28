@@ -1,7 +1,10 @@
 package unifacs.a3;
 
 import java.sql.Connection;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class Menu {
@@ -14,8 +17,8 @@ public class Menu {
         try {
             UsuarioBD usuarioBD = new UsuarioBD(con);
             HorarioBD horarioBD = new HorarioBD(con);
-            JustificativaBD justificativaBD = new JustificativaBD(con); // Instancia aqui para reutilizar
-            
+            JustificativaBD justificativaBD = new JustificativaBD(con); 
+            FaltaBD faltaBD = new FaltaBD(con);
             boolean continuar = true;
 
             // O LOOP FICA AQUI DENTRO
@@ -27,6 +30,7 @@ public class Menu {
                 System.out.println("3 - Registrar justificativa de atraso");
                 System.out.println("4 - Verificar faltas");
                 System.out.println("5 - Verificar atrasos");
+                System.out.println("6 - Registrar justificativa de falta");
                 System.out.println("0 - Sair"); // Opção de sair
                 
                 int opcao = scan.nextInt();
@@ -77,26 +81,30 @@ public class Menu {
                         break;
 
                     case 5:
-                        horarioBD.verifica_atraso(usuario.getId());
+                        List<LocalDate> atrasos = new ArrayList<>();
+                       atrasos= horarioBD.verifica_atraso(usuario.getId());
+                       for (LocalDate data : atrasos) {
+                           System.out.println("Atraso em: " + data);  
+                          }  
                         break;
                         
                         case 6:
-    // Usa a MESMA conexão recebida pelo Menu, igual aos outros BD
-    FaltaBD faltaBD = new FaltaBD(con);
-    JustificativaFalta justificativaFalta = new JustificativaFalta(faltaBD);
+    
+                        JustificativaFalta justificativaFalta = new JustificativaFalta(faltaBD);
 
-    System.out.println("Selecione o código de justificativa para FALTA:");
-    System.out.println("1 - Falecimento");
-    System.out.println("2 - Casamento");
-    System.out.println("3 - Nascimento ou Adoção");
-    System.out.println("4 - Doação de Sangue");
-    System.out.println("5 - Comparecimento em Juízo");
+                          System.out.println("Selecione o código de justificativa para FALTA:");
+                          System.out.println("1 - Falecimento");
+                          System.out.println("2 - Casamento");
+                          System.out.println("3 - Nascimento ou Adoção");
+                          System.out.println("4 - Doação de Sangue");
+                          System.out.println("5 - Comparecimento em Juízo");
 
-    int codigo = scan.nextInt();
+                         int codigo = scan.nextInt();
 
-    String respostaFalta = justificativaFalta.registrarJustificativa(usuario.getId(), codigo);
-    System.out.println(respostaFalta);
-    break;
+                          String respostaFalta = justificativaFalta.registrarJustificativa(usuario.getId(), codigo);
+                          System.out.println(respostaFalta);
+                          break;
+    
 
                         
                     case 0:
@@ -113,6 +121,6 @@ public class Menu {
             e.printStackTrace();
             System.out.println("Erro no menu: " + e.getMessage());
         }
-        // NÃO FECHAMOS A CONEXÃO AQUI (quem fecha é o App.java)
+        
     }
 }
