@@ -12,12 +12,12 @@ public class Menu {
     // AGORA RECEBE A CONEXÃO (con) COMO PARÂMETRO
     public static void start(Usuario usuario, Connection con) {
         Scanner scan = new Scanner(System.in);
-        
+
         // Instancia os objetos de banco UMA VEZ só, usando a conexão recebida
         try {
             UsuarioBD usuarioBD = new UsuarioBD(con);
             HorarioBD horarioBD = new HorarioBD(con);
-            JustificativaBD justificativaBD = new JustificativaBD(con); 
+            JustificativaBD justificativaBD = new JustificativaBD(con);
             FaltaBD faltaBD = new FaltaBD(con);
             boolean continuar = true;
 
@@ -32,7 +32,7 @@ public class Menu {
                 System.out.println("5 - Verificar atrasos");
                 System.out.println("6 - Registrar justificativa de falta");
                 System.out.println("0 - Sair"); // Opção de sair
-                
+
                 int opcao = scan.nextInt();
 
                 switch (opcao) {
@@ -52,7 +52,7 @@ public class Menu {
 
                     case 2:
                         System.out.println("Nome:");
-                        scan.nextLine(); 
+                        scan.nextLine();
                         String novoNome = scan.nextLine();
                         System.out.println("Email:");
                         String novoEmail = scan.nextLine();
@@ -67,12 +67,24 @@ public class Menu {
                         usuarioBD.cadastra_Usuario(novoUsuario);
                         break;
 
-                    case 3:
-                        // Passa o objeto BD já criado
-                        JustificativaAtraso justificativaAtraso = new JustificativaAtraso(justificativaBD);
-                        System.out.println("Código: 1-Falta, 2-Atestado, 3-Saída, 4-Hora Extra");
-                        int just = scan.nextInt();
-                        System.out.println(justificativaAtraso.registrarJustificativa(usuario.getId(), just));
+                    case 3: // Justificar
+                        System.out.println("--- SELECIONE UM ATRASO ---");
+                        // Chama o método com o nome original
+                        List<AtrasoDTO> listaParaJustificar = horarioBD.verifica_atraso(usuario.getId());
+
+                        for (AtrasoDTO a : listaParaJustificar) {
+                            System.out.println(a); // Imprime ID, Data e Status
+                        }
+
+                        System.out.println("Digite o ID do atraso:");
+                        int idAtraso = scan.nextInt();
+
+                        System.out.println("Motivo: 1-Falta, 2-Atestado...");
+                        int motivo = scan.nextInt();
+
+                        // Passa o ID para o serviço
+                        JustificativaAtraso service = new JustificativaAtraso(justificativaBD);
+                        System.out.println(service.registrarJustificativa(usuario.getId(), idAtraso, motivo));
                         break;
 
                     case 4:
@@ -80,38 +92,38 @@ public class Menu {
                         System.out.println("Faltas mês: " + horarioBD.faltasMensais(usuario.getId()));
                         break;
 
-                    case 5:
-                        List<LocalDate> atrasos = new ArrayList<>();
-                       atrasos= horarioBD.verifica_atraso(usuario.getId());
-                       for (LocalDate data : atrasos) {
-                           System.out.println("Atraso em: " + data);  
-                          }  
+                    case 5: // Apenas Verificar
+                        System.out.println("--- SEUS ATRASOS ---");
+                        // Reutiliza o mesmo método
+                        List<AtrasoDTO> historico = horarioBD.verifica_atraso(usuario.getId());
+
+                        for (AtrasoDTO a : historico) {
+                            System.out.println(a);
+                        }
                         break;
-                        
-                        case 6:
-    
+
+                    case 6:
+
                         JustificativaFalta justificativaFalta = new JustificativaFalta(faltaBD);
 
-                          System.out.println("Selecione o código de justificativa para FALTA:");
-                          System.out.println("1 - Falecimento");
-                          System.out.println("2 - Casamento");
-                          System.out.println("3 - Nascimento ou Adoção");
-                          System.out.println("4 - Doação de Sangue");
-                          System.out.println("5 - Comparecimento em Juízo");
+                        System.out.println("Selecione o código de justificativa para FALTA:");
+                        System.out.println("1 - Falecimento");
+                        System.out.println("2 - Casamento");
+                        System.out.println("3 - Nascimento ou Adoção");
+                        System.out.println("4 - Doação de Sangue");
+                        System.out.println("5 - Comparecimento em Juízo");
 
-                         int codigo = scan.nextInt();
+                        int codigo = scan.nextInt();
 
-                          String respostaFalta = justificativaFalta.registrarJustificativa(usuario.getId(), codigo);
-                          System.out.println(respostaFalta);
-                          break;
-    
+                        String respostaFalta = justificativaFalta.registrarJustificativa(usuario.getId(), codigo);
+                        System.out.println(respostaFalta);
+                        break;
 
-                        
                     case 0:
                         continuar = false;
                         System.out.println("Saindo...");
                         break;
-                        
+
                     default:
                         System.out.println("Opção inválida!");
                 }
@@ -121,6 +133,6 @@ public class Menu {
             e.printStackTrace();
             System.out.println("Erro no menu: " + e.getMessage());
         }
-        
+
     }
 }

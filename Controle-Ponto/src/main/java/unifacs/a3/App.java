@@ -5,54 +5,50 @@ import java.util.Scanner;
 
 public class App {
 
-    public static void main(String[] args)   {
-  try (Connection con = ConnectionManager.getConnection()) { 
-        int alternativa = 0;
-        Scanner scan = new Scanner(System.in);
+  public static void main(String[] args) {
+    try (Connection con = ConnectionManager.getConnection()) {
+      int alternativa = 0;
+      Scanner scan = new Scanner(System.in);
 
-        // Acesso ao Sistema
-        Usuario user= new Usuario();
-        System.out.println("Digite seu nome:");
-        String nome = scan.nextLine();
-         user.setNome(nome);
-        System.out.println("Digite sua senha:");
-        int senha = scan.nextInt();
-        user.setSenha(senha);
-        // Verifica se o usuário existe no BD
-        UsuarioBD usuarioBD = new UsuarioBD(con);
-        Usuario usuario =usuarioBD.verificaUser(user);
-   //INICIO MENU
-        if (usuario != null && usuario.getId() > 0) {
-       Menu.start(usuario,con);
+      // Acesso ao Sistema
+      Usuario user = new Usuario();
+      System.out.println("Digite seu nome:");
+      String nome = scan.nextLine();
+      user.setNome(nome);
+      System.out.println("Digite sua senha:");
+      int senha = scan.nextInt();
+      user.setSenha(senha);
+      // Verifica se o usuário existe no BD
+      UsuarioBD usuarioBD = new UsuarioBD(con);
+      Usuario usuario = usuarioBD.verificaUser(user);
+      // INICIO MENU
+      if (usuario != null && usuario.getId() > 0) {
+        Menu.start(usuario, con);
 
-        } else {
-            System.out.println("Usuário não cadastrado");
-            System.out.println("1 - Recuperar senha\n2 - Sair");
-            alternativa = scan.nextInt();
-            if (alternativa == 1) {
-                System.out.println("Digite seu email:");
-                scan.nextLine();
-                String email= scan.nextLine();
-               
-               System.out.println("Digite sua nova senha:");
-               int novaSenha = scan.nextInt();
+      } else {
+        System.out.println("Usuário não cadastrado");
+        System.out.println("1 - Recuperar senha\n2 - Sair");
+        alternativa = scan.nextInt();
+        if (alternativa == 1) {
+          System.out.println("Digite seu email:");
+          scan.nextLine();
+          String email = scan.nextLine();
 
-             
-                      UsuarioRepository repo = new UsuarioRepository(con);
-                       RecuperaSenhaService service = new RecuperaSenhaService(repo);
-                       System.out.println(service.recuperarSenha(email, novaSenha));
+          System.out.println("Digite sua nova senha:");
+          int novaSenha = scan.nextInt();
 
-                     
-           
-            }
+          UsuarioRepository repo = new UsuarioRepository(con);
+          RecuperaSenhaService service = new RecuperaSenhaService(repo);
+          System.out.println(service.recuperarSenha(email, novaSenha));
+
         }
+      }
 
-          scan.close(); 
-            
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+      scan.close();
 
-       
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+
   }
 }

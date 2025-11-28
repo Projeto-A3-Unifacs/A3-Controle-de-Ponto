@@ -136,21 +136,34 @@ public  void registra_Saida(int usuarioId) throws Exception {
 
 
     
-     public  List<LocalDate> verifica_atraso(int id) throws Exception {
-        List<LocalDateTime> entradas = buscarEntradasPorUsuario(id);
-        List<LocalDate> atrasos = new ArrayList<>();
+     public List<AtrasoDTO> verifica_atraso(int usuarioId) throws Exception {
+        List<AtrasoDTO> lista = new ArrayList<>();
+        
+        String sql = 
+            "SELECT h.id, h.entrada, j.tipo " +
+            "FROM horarios h " +
+            "LEFT JOIN justificativa j ON h.id = j.horario_id " +
+            "WHERE h.usuario_id = ? " +
+            "AND EXTRACT(HOUR FROM h.entrada) >= 8 " + 
+            "ORDER BY h.entrada DESC";
 
-        LocalTime horarioLimite = LocalTime.of(8, 0);
-
-        for (LocalDateTime entrada : entradas) {
-            if (entrada.toLocalTime().isAfter(horarioLimite)) {
-                atrasos.add(entrada.toLocalDate());
+        try (PreparedStatement ps = this.connect.prepareStatement(sql)) {
+            ps.setInt(1, usuarioId);
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    int id = rs.getInt("id");
+                    java.sql.Timestamp ts = rs.getTimestamp("entrada");
+                    String justificativa = rs.getString("tipo");
+                    
+                    lista.add(new AtrasoDTO(id, ts.toLocalDateTime(), justificativa));
+                }
             }
         }
-         
-        return atrasos;
+        return lista;
     }
 
+    
     // Método auxiliar: consulta o BD (ou pode ser substituído por dados falsos no teste)
     public  List<LocalDateTime> buscarEntradasPorUsuario(int id) throws Exception {
         
