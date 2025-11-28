@@ -5,15 +5,17 @@ import java.sql.PreparedStatement;
 
 public class FaltaBD {
 
+
+     private Connection con;
     public FaltaBD(Connection con) {
-        //TODO Auto-generated constructor stub
+        this.con = con;
     }
 
     public void registra_faltaBD(int id, String motivo) throws Exception {
-        Connection con = UsuarioBD.conexao_BD();
+        ;
 
         PreparedStatement ps = con.prepareStatement(
-            "INSERT INTO Faltas (motivo, usuario_id) VALUES (?, ?)"
+            "INSERT INTO faltas (motivo, usuario_id) VALUES (?, ?)"
         );
 
         ps.setString(1, motivo);
@@ -21,6 +23,6 @@ public class FaltaBD {
         ps.executeUpdate();
 
         ps.close();
-        con.close();
+        
     }
 }

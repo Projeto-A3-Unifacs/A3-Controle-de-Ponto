@@ -147,7 +147,7 @@ public  void registra_Saida(int usuarioId) throws Exception {
                 atrasos.add(entrada.toLocalDate());
             }
         }
-
+         
         return atrasos;
     }
 

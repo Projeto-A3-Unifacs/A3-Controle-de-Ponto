@@ -5,7 +5,7 @@ public class JustificativaFalta {
     private final FaltaBD justificativaRepository;
 
     public JustificativaFalta(FaltaBD justificativaRepository) {
-        this.justificativaRepository = java.util.Objects.requireNonNull(justificativaRepository);
+        this.justificativaRepository = justificativaRepository;
     }
 
     public String registrarJustificativa(int usuarioId, int codigoJustificativa) throws Exception {
