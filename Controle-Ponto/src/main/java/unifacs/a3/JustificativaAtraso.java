@@ -6,7 +6,7 @@ public class JustificativaAtraso {
     public JustificativaAtraso(JustificativaBD justificativaRepository) {
         this.justificativaRepository = justificativaRepository;
     }
-    public String registrarJustificativa(int usuarioId, int codigoJustificativa) throws Exception {
+    public String registrarJustificativa(int usuarioId, int idAtraso, int codigoJustificativa) throws Exception {
         String tipo;
 
         switch (codigoJustificativa) {
@@ -26,7 +26,7 @@ public class JustificativaAtraso {
                 return "Opção inválida.";
         }
 
-        justificativaRepository.salvarJustificativa(usuarioId, tipo);
+        justificativaRepository.salvarJustificativa(usuarioId,idAtraso, tipo);
         return "Justificativa registrada: " + tipo;
     }
 
