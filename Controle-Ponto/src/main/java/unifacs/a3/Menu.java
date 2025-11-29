@@ -67,23 +67,59 @@ public class Menu {
                         usuarioBD.cadastra_Usuario(novoUsuario);
                         break;
 
-                    case 3: 
-                        System.out.println("--- SELECIONE UM ATRASO ---");
-                       
-                        List<AtrasoDTO> listaParaJustificar = horarioBD.verifica_atraso(usuario.getId());
+                    case 3: // REGISTRAR JUSTIFICATIVA
+                        System.out.println("\n--- JUSTIFICAR ATRASOS PENDENTES ---");
 
-                        for (AtrasoDTO a : listaParaJustificar) {
-                            System.out.println(a); // Imprime ID, Data e Status
+                        // 1. Busca TUDO do banco
+                        List<AtrasoDTO> todosAtrasos = horarioBD.verifica_atraso(usuario.getId());
+
+                        // 2. Cria uma lista nova só para os que NÃO têm justificativa (Status == null)
+                        List<AtrasoDTO> pendentes = new ArrayList<>();
+                        for (AtrasoDTO dto : todosAtrasos) {
+                            if (dto.getStatusJustificativa() == null) {
+                                pendentes.add(dto);
+                            }
                         }
 
-                        System.out.println("Digite o ID do atraso:");
-                        int idAtraso = scan.nextInt();
+                        // 3. Verifica se tem algo para fazer
+                        if (pendentes.isEmpty()) {
+                            System.out.println("✅ Parabéns! Você não possui atrasos pendentes para justificar.");
+                            break; // Sai do case 3 e volta pro menu principal
+                        }
 
-                        System.out.println("Motivo: 1-Falta Injustificada, 2-Atestado, 3-Saída Antecipada, 4-Hora Extra");
-                        int motivo = scan.nextInt();
+                        // 4. Mostra APENAS os pendentes
+                        for (AtrasoDTO dto : pendentes) {
+                            System.out.println(dto); // Vai imprimir formatado com sua data BR
+                        }
 
-                        JustificativaAtraso service = new JustificativaAtraso(justificativaBD);
-                        System.out.println(service.registrarJustificativa(usuario.getId(), idAtraso, motivo));
+                        System.out.println("\nDigite o ID do atraso que deseja justificar:");
+                        int idEscolhido = scan.nextInt();
+
+                        // 5. VALIDAÇÃO DE SEGURANÇA:
+                        // Garante que o ID digitado realmente pertence à lista de pendentes
+                        boolean idValido = false;
+                        for (AtrasoDTO dto : pendentes) {
+                            if (dto.getId() == idEscolhido) {
+                                idValido = true;
+                                break;
+                            }
+                        }
+
+                        if (!idValido) {
+                            System.out.println("❌ Erro: Esse ID não existe ou já foi justificado!");
+                        } else {
+                            // Se passou na validação, prossegue
+                            System.out.println("Selecione o motivo:");
+                            System.out.println("1 - Falta Injustificada");
+                            System.out.println("2 - Atestado");
+                            System.out.println("3 - Saída Antecipada");
+                            System.out.println("4 - Hora Extra");
+                            int motivo = scan.nextInt();
+
+                            JustificativaAtraso service = new JustificativaAtraso(justificativaBD);
+                            String resultado = service.registrarJustificativa(usuario.getId(), idEscolhido, motivo);
+                            System.out.println(resultado);
+                        }
                         break;
 
                     case 4:
