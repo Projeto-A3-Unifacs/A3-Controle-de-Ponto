@@ -1,17 +1,13 @@
 package unifacs.a3;
 
 import java.sql.Connection;
-import java.sql.SQLException;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.ArrayList;
 
 public class HorarioTestHelper {
 
-     private static Connection conexao;
+    private static Connection conexao;
     private static HorarioBD horarioBD;
 
     // Inicializa a conexão e o DAO apenas uma vez
@@ -51,19 +47,16 @@ public class HorarioTestHelper {
         }
     }
 
-    public static List<LocalDate> verificaAtraso(int usuarioId) {
+    
+    public static List<AtrasoDTO> verificaAtraso(int usuarioId) {
         try {
             return horarioBD.verifica_atraso(usuarioId);
         } catch (Exception e) {
             e.printStackTrace();
-            return List.of();
+           
+            return new ArrayList<>(); 
         }
     }
 
-    // Se precisar de acesso direto ao DAO
-    public static HorarioBD getHorarioBD() {
-        return horarioBD;
-    }
-     
-     
+   
 }
