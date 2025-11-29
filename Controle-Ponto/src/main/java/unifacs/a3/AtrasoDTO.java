@@ -1,6 +1,7 @@
 package unifacs.a3;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class AtrasoDTO {
 
@@ -21,8 +22,15 @@ public class AtrasoDTO {
     
     @Override
     public String toString() {
+       
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+   
+        String dataFormatada = dataHora.format(formatter);
+        
         String status = (statusJustificativa == null) ? "[PENDENTE]" : "Justificado: " + statusJustificativa;
-        return "ID: " + id + " | Data: " + dataHora + " | " + status;
+        
+       
+        return "ID: " + id + " | Data: " + dataFormatada + " | " + status;
     }
 
 }
