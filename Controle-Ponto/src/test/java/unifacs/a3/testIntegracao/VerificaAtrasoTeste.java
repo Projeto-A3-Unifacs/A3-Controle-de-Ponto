@@ -15,6 +15,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
+import unifacs.a3.AtrasoDTO;
 import unifacs.a3.ConnectionManager;
 import unifacs.a3.HorarioBD;
 import unifacs.a3.Usuario;
@@ -81,27 +82,34 @@ public class VerificaAtrasoTeste {
 
 
 
-    @Test
-    void testeVerificarAtrasos() throws Exception {
-HorarioBD HorarioBD = new HorarioBD(connection);
-        // Entrada sem atraso: 07:55
-        inserirEntrada(LocalDateTime.of(2025, 1, 10, 7, 55));
+ @Test
+void testeVerificarAtrasos() throws Exception {
+ 
+    HorarioBD horarioBD = new HorarioBD(connection);
 
-        // Entrada com atraso: 08:15
-        inserirEntrada(LocalDateTime.of(2025, 1, 11, 8, 15));
+   
+    inserirEntrada(LocalDateTime.of(2025, 1, 10, 7, 55));
 
-        // Chama método sendo testado
-        List<LocalDate> atrasos = HorarioBD.verifica_atraso(usuarioIdTeste);
+    
+    inserirEntrada(LocalDateTime.of(2025, 1, 11, 8, 15));
 
-        // Deve ter 1 atraso
-        Assertions.assertEquals(1, atrasos.size());
+    
+    List<AtrasoDTO> atrasos = horarioBD.verifica_atraso(usuarioIdTeste);
 
-        // O atraso deve ser do dia 11
-        Assertions.assertTrue(
-            atrasos.contains(LocalDate.of(2025, 1, 11)),
-            "A data do atraso deveria ser 11/01/2025"
-        );
-    }
+    Assertions.assertEquals(1, atrasos.size(), "Deveria ter encontrado exatamente 1 atraso.");
+
+  
+    AtrasoDTO atrasoEncontrado = atrasos.get(0);
+    
+  
+    Assertions.assertEquals(
+        LocalDate.of(2025, 1, 11), 
+        atrasoEncontrado.getDataHora().toLocalDate(), 
+        "A data do atraso encontrado deveria ser dia 11."
+    );
+    
+   
+}
 
     
 
