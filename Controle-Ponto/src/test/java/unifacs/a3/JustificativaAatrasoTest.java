@@ -19,7 +19,7 @@ public class JustificativaAatrasoTest {
         verify(repoMock).salvarJustificativa(1, 50, "Atestado");
         
        
-        assertEquals("Justificativa registrada com sucesso: Atestado", resultado);
+        assertEquals("Justificativa registrada: Atestado", resultado);
     }
 
     @Test

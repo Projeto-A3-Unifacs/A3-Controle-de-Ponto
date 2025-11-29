@@ -55,7 +55,7 @@ public class JustificativaIntegracaoMenuTest {
         // 4) Simula a entrada do usuário no console:
         //    3 -> opção "Registrar justificativa de atraso" no menu
         //    2 -> "Atestado" na lista de justificativas
-        String entradaSimulada = "3\n2\n";
+        String entradaSimulada = "3\n43\n2\n0\n"; // 43 é um id de atraso fictício, 0 para sair depois
 
         InputStream originalIn = System.in;
         try {
@@ -116,17 +116,26 @@ public class JustificativaIntegracaoMenuTest {
     private void limparJustificativasUsuario(int usuarioId) throws Exception {
         
              PreparedStatement ps = con.prepareStatement(
-                     "DELETE FROM justificativa WHERE usuario_id = ?");
+                     "DELETE FROM justificativa WHERE tipo = ?");
 
-            ps.setInt(1, usuarioId);
+            ps.setString(1, "Atestado");
             ps.executeUpdate();
         
     }
 
     @AfterAll
    void fecharConexao() throws SQLException {
-       
+       deletarUsuarioDeTeste();
       
         con.close();
+    }
+
+    private void deletarUsuarioDeTeste() throws SQLException {
+        PreparedStatement ps = con.prepareStatement(
+            "DELETE FROM usuario WHERE nome = ? "
+        );
+       
+        ps.setString(1, "Usuario Teste");
+        ps.executeUpdate();
     }
 }

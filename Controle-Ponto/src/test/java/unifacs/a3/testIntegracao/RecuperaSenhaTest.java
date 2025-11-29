@@ -19,6 +19,7 @@ import org.junit.jupiter.api.TestInstance;
 import unifacs.a3.ConnectionManager;
 import unifacs.a3.UsuarioBD;
 import unifacs.a3.UsuarioRepository;
+
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class RecuperaSenhaTest {
 
@@ -27,7 +28,7 @@ public class RecuperaSenhaTest {
 
     @BeforeAll
     void setupDatabase() throws SQLException {
-        connection =  ConnectionManager.getConnection();
+        connection = ConnectionManager.getConnection();
         repositorio = new UsuarioRepository(connection);
 
     }
@@ -35,8 +36,9 @@ public class RecuperaSenhaTest {
     @BeforeEach
     void popularBanco() throws SQLException {
         try (Statement stmt = connection.createStatement()) {
-            
-            stmt.execute("INSERT INTO usuario (nome, email, senha) VALUES ('lina','ana@email.com', 123), ('juca','joao@email.com', 456)");
+
+            stmt.execute(
+                    "INSERT INTO usuario (nome, email, senha) VALUES ('lina','ana@email.com', 123), ('juca','joao@email.com', 456)");
         }
     }
 
@@ -64,20 +66,22 @@ public class RecuperaSenhaTest {
         }
     }
 
-
-    
     @AfterAll
-   void fecharConexao() throws SQLException {
-        PreparedStatement ps = connection.prepareStatement("DELETE FROM usuario WHERE nome = ? AND email = ? AND senha=?");
-            ps.setString(1, "lina");
-            ps.setString(2, "ana@email.com");
-            ps.setInt(3,999);
-            ps.executeUpdate();
-        
+    void fecharConexao() throws SQLException {
+        PreparedStatement ps = connection.prepareStatement(
+                "DELETE FROM usuario  WHERE (nome = ? AND email = ? AND senha = ?) OR (nome = ? AND email = ? AND senha = ?)");
+
+        ps.setString(1, "lina");
+        ps.setString(2, "ana@email.com");
+        ps.setInt(3, 999);
+
+        ps.setString(4, "juca");
+        ps.setString(5, "joao@email.com");
+        ps.setInt(6, 456);
+
+        ps.executeUpdate();
+
         connection.close();
     }
-    
+
 }
-
-
-

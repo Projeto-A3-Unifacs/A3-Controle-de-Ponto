@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -62,7 +63,8 @@ public class VerificaUserTest {
         assert usuarioVerificado.getSenha() == 456;
         assert usuarioVerificado.getEmail().equals("nica@gmail.com");
     }
-    public void fecharConexao() throws SQLException {
+    @AfterAll
+     void fecharConexao() throws SQLException {
         deletarUsuarioDeTeste();
         connection.close();
     }
