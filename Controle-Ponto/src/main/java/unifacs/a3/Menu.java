@@ -67,9 +67,9 @@ public class Menu {
                         usuarioBD.cadastra_Usuario(novoUsuario);
                         break;
 
-                    case 3: // Justificar
+                    case 3: 
                         System.out.println("--- SELECIONE UM ATRASO ---");
-                        // Chama o método com o nome original
+                       
                         List<AtrasoDTO> listaParaJustificar = horarioBD.verifica_atraso(usuario.getId());
 
                         for (AtrasoDTO a : listaParaJustificar) {
@@ -79,10 +79,9 @@ public class Menu {
                         System.out.println("Digite o ID do atraso:");
                         int idAtraso = scan.nextInt();
 
-                        System.out.println("Motivo: 1-Falta, 2-Atestado...");
+                        System.out.println("Motivo: 1-Falta Injustificada, 2-Atestado, 3-Saída Antecipada, 4-Hora Extra");
                         int motivo = scan.nextInt();
 
-                        // Passa o ID para o serviço
                         JustificativaAtraso service = new JustificativaAtraso(justificativaBD);
                         System.out.println(service.registrarJustificativa(usuario.getId(), idAtraso, motivo));
                         break;
