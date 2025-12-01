@@ -1,4 +1,0 @@
-Teste CI
-Reexecutando teste CI
-Validação commitlint ok
-Teste commitlint
