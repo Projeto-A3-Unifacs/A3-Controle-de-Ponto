@@ -8,7 +8,7 @@ import java.sql.PreparedStatement;
 
 import org.junit.jupiter.api.Test;
 
-public class FaltaBDTest {
+public class JustificativaFaltaTest {
 
     @Test
     void testRegistraFaltaSimples() throws Exception {
