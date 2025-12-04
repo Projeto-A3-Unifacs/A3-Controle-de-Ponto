@@ -3,6 +3,7 @@ package unifacs.a3.testIntegracao;
 import org.junit.jupiter.api.*;
 import java.sql.*;
 import java.time.LocalDate;
+import java.util.Set;
 
 import unifacs.a3.ConnectionManager;
 import unifacs.a3.HorarioTestHelper;
@@ -39,35 +40,52 @@ public class FaltasMensaisTeste {
 
     @Test
     void testeFaltasMensais() throws Exception {
-
-        LocalDate hoje = LocalDate.now();
-        LocalDate inicioMes = hoje.withDayOfMonth(1);
-
-        inserirEntrada(inicioMes.plusDays(0));
-        inserirEntrada(inicioMes.plusDays(2));
-        inserirEntrada(inicioMes.plusDays(4));
-
-        int diasUteisTotais = 0;
-        LocalDate dia = inicioMes;
-
-        while (!dia.isAfter(hoje)) {
-            if (dia.getDayOfWeek().getValue() <= 5) {
-                diasUteisTotais++;
-            }
-            dia = dia.plusDays(1);
-        }
-
-        int faltasEsperadas = diasUteisTotais - 3;
-
-        int faltasCalculadas = HorarioTestHelper.faltasMensais(usuarioIdTeste);
-
-        Assertions.assertEquals(
-            faltasEsperadas,
-            faltasCalculadas,
-            "O total de faltas mensais está incorreto."
+      
+        LocalDate inicioMes = LocalDate.now().withDayOfMonth(1);
+        
+        var diasTrabalhados = Set.of(
+            inicioMes.plusDays(0), // Veio no dia 1
+            inicioMes.plusDays(2), // Veio no dia 3
+            inicioMes.plusDays(4)  // Veio no dia 5
         );
+
+        registrarPresencasNoBanco(diasTrabalhados);
+
+        // 2. ACT: Executa o sistema
+        int faltasReais = HorarioTestHelper.faltasMensais(usuarioIdTeste);
+
+        // 3. ASSERT: Valida contra nosso "Oráculo" (Cálculo auxiliar)
+        int faltasEsperadas = calcularFaltasEsperadasAteHoje(diasTrabalhados);
+        
+        Assertions.assertEquals(faltasEsperadas, faltasReais, 
+            "O cálculo de faltas do sistema não bateu com a expectativa matemática.");
     }
 
+
+
+    private void registrarPresencasNoBanco(java.util.Set<LocalDate> dias) throws Exception {
+        for (LocalDate dia : dias) {
+            inserirEntrada(dia);
+        }
+    }
+
+    private int calcularFaltasEsperadasAteHoje(java.util.Set<LocalDate> diasPresenca) {
+        LocalDate hoje = LocalDate.now();
+        LocalDate cursor = hoje.withDayOfMonth(1);
+        int contadorFaltas = 0;
+
+        while (!cursor.isAfter(hoje)) {
+            boolean ehDiaUtil = cursor.getDayOfWeek().getValue() <= 5; // 1=Seg, 5=Sex
+            boolean veioTrabalhar = diasPresenca.contains(cursor);
+
+            if (ehDiaUtil && !veioTrabalhar) {
+                contadorFaltas++;
+            }
+            cursor = cursor.plusDays(1);
+        }
+        return contadorFaltas;
+    }
+    
     @AfterEach
     void finalizar() throws Exception {
         limparRegistros();

@@ -13,7 +13,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
-import unifacs.a3.UsuarioBD;
+
 import unifacs.a3.ConnectionManager;
 import unifacs.a3.HorarioBD;
 
