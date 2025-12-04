@@ -24,18 +24,16 @@ public class JustificativaIntegracaoMenuTest {
 
     @Test
     void deveRegistrarJustificativaPassandoPeloMenuCase3() throws Exception {
-        // --- 1. ARRANGE (PREPARAÇÃO) ---
-        int usuarioId = prepararUsuarioDeTeste(); // Cria user e limpa dados antigos
-        int idAtraso = criarAtrasoNoBanco(usuarioId); // Cria o "problema" para resolver
+     
+        int usuarioId = prepararUsuarioDeTeste(); 
+        int idAtraso = criarAtrasoNoBanco(usuarioId); 
         Usuario usuarioLogado = montarObjetoUsuario(usuarioId);
 
-        // --- 2. ACT (AÇÃO) ---
-        // Simula: Menu(3) -> ID do Atraso -> Motivo Atestado(2) -> Sair(0)
+       
         String inputUsuario = "3\n" + idAtraso + "\n2\n0\n";
         
         executarMenuComInputs(usuarioLogado, inputUsuario);
 
-        // --- 3. ASSERT (VALIDAÇÃO) ---
         JustificativaDTO resultado = buscarUltimaJustificativa(usuarioId);
 
         assertNotNull(resultado, "Deveria ter gravado uma justificativa.");
@@ -43,9 +41,6 @@ public class JustificativaIntegracaoMenuTest {
         assertEquals(idAtraso, resultado.horarioId, "A justificativa foi ligada ao atraso errado.");
     }
 
-    // ========================================================================
-    // 🛠️ MÉTODOS AUXILIARES (A "SUJEIRA" FICA AQUI EMBAIXO)
-    // ========================================================================
 
     private void executarMenuComInputs(Usuario usuario, String inputs) {
         InputStream originalIn = System.in;

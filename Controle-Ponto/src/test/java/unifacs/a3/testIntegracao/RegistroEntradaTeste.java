@@ -7,14 +7,14 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
-import org.checkerframework.checker.units.qual.C;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
-import unifacs.a3.UsuarioBD;
+
 import unifacs.a3.ConnectionManager;
 import unifacs.a3.HorarioBD;
 
