@@ -59,6 +59,12 @@ public class UsuarioBD {
     }
 
 
+    public static Connection conexao_BD() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'conexao_BD'");
+    }
+
+
 
    
 }

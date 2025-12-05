@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -14,13 +15,13 @@ import unifacs.a3.UsuarioBD;
 import unifacs.a3.UsuarioRepository;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class VerifcaUserTest {
+public class VerificaUserTest {
  private Connection connection;
  private UsuarioRepository repositorio;
 
     @BeforeAll
    public  void setupDatabase() throws SQLException {
-        connection =  ConnectionManager.getConnection();
+        connection = ConnectionManager.getConnection();
         repositorio = new UsuarioRepository(connection);
         deletarUsuarioDeTeste();
 
@@ -50,29 +51,21 @@ public class VerifcaUserTest {
 
     @Test
     void testeVerificaUsuario() throws Exception {
-    // Cria a conexão real com o banco
-    try (Connection conn = ConnectionManager.getConnection()) {
-
-        // Instancia o DAO com a conexão
-        UsuarioBD usuarioBD = new UsuarioBD(conn);
-
-        // Cria usuário de teste
         Usuario usuarioTeste = new Usuario();
         usuarioTeste.setNome("Nicole Silva");
         usuarioTeste.setSenha(456);
         usuarioTeste.setEmail("nica@gmail.com");
-
-        // Insere usuário no BD (pode ser um método auxiliar que usa o mesmo DAO)
-        usuarioBD.cadastra_Usuario(usuarioTeste);
-
-        // Verifica usuário usando o DAO com conexão
+        inserindoUsuarioDeTeste(usuarioTeste);
+        UsuarioBD usuarioBD = new UsuarioBD(connection);
         Usuario usuarioVerificado = usuarioBD.verificaUser(usuarioTeste);
-
-        // Validações
         assert usuarioVerificado != null;
         assert usuarioVerificado.getNome().equals("Nicole Silva");
         assert usuarioVerificado.getSenha() == 456;
         assert usuarioVerificado.getEmail().equals("nica@gmail.com");
     }
-}
+    @AfterAll
+     void fecharConexao() throws SQLException {
+        deletarUsuarioDeTeste();
+        connection.close();
+    }
 }

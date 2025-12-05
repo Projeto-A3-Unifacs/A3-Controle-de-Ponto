@@ -1,0 +1,18 @@
+-------------------------------------------------------------------------------
+Test set: unifacs.a3.testIntegracao.VerificaAtrasoTeste
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 1.752 s <<< FAILURE! -- in unifacs.a3.testIntegracao.VerificaAtrasoTeste
+unifacs.a3.testIntegracao.VerificaAtrasoTeste -- Time elapsed: 1.752 s <<< ERROR!
+java.lang.NullPointerException: Cannot invoke "java.sql.Connection.prepareStatement(String)" because "this.connection" is null
+	at unifacs.a3.testIntegracao.VerificaAtrasoTeste.limparRegistros(VerificaAtrasoTeste.java:38)
+	at unifacs.a3.testIntegracao.VerificaAtrasoTeste.setup(VerificaAtrasoTeste.java:31)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597)
+	Suppressed: java.lang.NullPointerException: Cannot invoke "java.sql.Connection.prepareStatement(String)" because "this.connection" is null
+		at unifacs.a3.testIntegracao.VerificaAtrasoTeste.limparRegistros(VerificaAtrasoTeste.java:38)
+		at unifacs.a3.testIntegracao.VerificaAtrasoTeste.finalizar(VerificaAtrasoTeste.java:109)
+		at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+		at java.base/java.util.ArrayList.forEach(ArrayList.java:1597)
+		at java.base/java.util.Collections$UnmodifiableCollection.forEach(Collections.java:1117)
+		... 1 more
+

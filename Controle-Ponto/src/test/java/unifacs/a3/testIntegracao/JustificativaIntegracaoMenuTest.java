@@ -1,132 +1,133 @@
 package unifacs.a3.testIntegracao;
 
-import org.checkerframework.checker.units.qual.C;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-
+import org.junit.jupiter.api.*;
 import unifacs.a3.ConnectionManager;
 import unifacs.a3.Menu;
 import unifacs.a3.Usuario;
-import unifacs.a3.UsuarioBD;
-import unifacs.a3.UsuarioRepository;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.time.LocalDateTime;
 
-import org.junit.jupiter.api.TestInstance;
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * Teste de integração para a funcionalidade de justificativa de atraso via Menu (Case 3).
- *
- * Este teste simula a interação do usuário para registrar uma justificativa
- * de atraso, passando pela interface do Menu e verificando a gravação no banco.
- */
-    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class JustificativaIntegracaoMenuTest {
 
     private Connection con;
 
-
     @BeforeAll
-   public  void setupDatabase() throws SQLException {
-        con =ConnectionManager.getConnection();
-       }
+    void setupDatabase() throws SQLException {
+        con = ConnectionManager.getConnection();
+    }
 
     @Test
     void deveRegistrarJustificativaPassandoPeloMenuCase3() throws Exception {
+     
+        int usuarioId = prepararUsuarioDeTeste(); 
+        int idAtraso = criarAtrasoNoBanco(usuarioId); 
+        Usuario usuarioLogado = montarObjetoUsuario(usuarioId);
 
-        // 1) Cria um usuário de teste real
-        int usuarioId = criarUsuarioDeTeste();
+       
+        String inputUsuario = "3\n" + idAtraso + "\n2\n0\n";
+        
+        executarMenuComInputs(usuarioLogado, inputUsuario);
 
-        // 2) Limpa justificativas anteriores desse usuário
-        limparJustificativasUsuario(usuarioId);
+        JustificativaDTO resultado = buscarUltimaJustificativa(usuarioId);
 
-        // 3) Prepara o objeto de usuário
-        Usuario usuario = new Usuario();
-        usuario.setId(usuarioId);
+        assertNotNull(resultado, "Deveria ter gravado uma justificativa.");
+        assertEquals("Atestado", resultado.tipo);
+        assertEquals(idAtraso, resultado.horarioId, "A justificativa foi ligada ao atraso errado.");
+    }
 
-        // 4) Simula a entrada do usuário no console:
-        //    3 -> opção "Registrar justificativa de atraso" no menu
-        //    2 -> "Atestado" na lista de justificativas
-        String entradaSimulada = "3\n2\n";
 
+    private void executarMenuComInputs(Usuario usuario, String inputs) {
         InputStream originalIn = System.in;
         try {
-            System.setIn(new ByteArrayInputStream(entradaSimulada.getBytes()));
-
-            // 5) Executa o Menu, que vai ler as opções como se fosse o usuário digitando
-            Menu.start(usuario,con);
-
+            System.setIn(new ByteArrayInputStream(inputs.getBytes()));
+            Menu.start(usuario, con);
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao executar Menu no teste", e);
         } finally {
-            // 6) Restaura a entrada padrão
             System.setIn(originalIn);
         }
-
-        // 7) Verifica se a justificativa foi registrada no banco para esse usuário
-     
-             PreparedStatement ps = con.prepareStatement(
-                     "SELECT tipo FROM justificativa WHERE usuario_id = ? ORDER BY id DESC LIMIT 1"
-             );
-
-            ps.setInt(1, usuarioId);
-            ResultSet rs = ps.executeQuery();
-
-            assertTrue(rs.next(), "Nenhuma justificativa foi encontrada no banco para o usuário!");
-            assertEquals("Atestado", rs.getString("tipo"));
-            
-        
     }
 
-    // ========================================================================
-    // MÉTODOS DE APOIO
-    // ========================================================================
-
-    /**
-     * Cria um usuário de teste real no banco de dados
-     * e retorna o ID gerado automaticamente.
-     */
-    private int criarUsuarioDeTeste() throws Exception {
-     
-             PreparedStatement ps = con.prepareStatement(
-                     "INSERT INTO usuario(nome, email, senha) VALUES (?, ?, ?) RETURNING id"
-             );
-
-            ps.setString(1, "Usuario Teste");
-            ps.setString(2, "teste_" + System.currentTimeMillis() + "@teste.com");
-            ps.setInt(3, 123);
-
-            ResultSet rs = ps.executeQuery();
-            rs.next();
-            return rs.getInt("id");
-            
+    private int prepararUsuarioDeTeste() throws Exception {
+        // Garante estado limpo
+        deletarUsuarioPeloEmail("teste_integracao@teste.com");
         
+        PreparedStatement ps = con.prepareStatement(
+            "INSERT INTO usuario(nome, email, senha) VALUES (?, ?, ?) RETURNING id"
+        );
+        ps.setString(1, "Usuario Teste");
+        ps.setString(2, "teste_integracao@teste.com");
+        ps.setInt(3, 123);
+        ResultSet rs = ps.executeQuery();
+        rs.next();
+        return rs.getInt("id");
     }
 
-    /**
-     * Remove todas as justificativas do usuário informado,
-     * garantindo que o teste comece com um estado limpo.
-     */
-    private void limparJustificativasUsuario(int usuarioId) throws Exception {
-        
-             PreparedStatement ps = con.prepareStatement(
-                     "DELETE FROM justificativa WHERE usuario_id = ?");
+    private int criarAtrasoNoBanco(int usuarioId) throws Exception {
+        PreparedStatement ps = con.prepareStatement(
+            "INSERT INTO horarios(usuario_id, entrada) VALUES (?, ?) RETURNING id"
+        );
+        ps.setInt(1, usuarioId);
+        // Cria atraso às 09:00
+        ps.setTimestamp(2, Timestamp.valueOf(LocalDateTime.now().withHour(9).withMinute(0)));
+        ResultSet rs = ps.executeQuery();
+        rs.next();
+        return rs.getInt("id");
+    }
 
-            ps.setInt(1, usuarioId);
-            ps.executeUpdate();
+    private Usuario montarObjetoUsuario(int id) {
+        Usuario u = new Usuario();
+        u.setId(id);
+        u.setNome("Usuario Teste");
+        return u;
+    }
+
+    // Classe interna simples só para transportar o resultado do banco
+    class JustificativaDTO {
+        String tipo;
+        int horarioId;
+    }
+
+    private JustificativaDTO buscarUltimaJustificativa(int usuarioId) throws SQLException {
+        PreparedStatement ps = con.prepareStatement(
+            "SELECT tipo, horario_id FROM justificativa WHERE usuario_id = ? ORDER BY id DESC LIMIT 1"
+        );
+        ps.setInt(1, usuarioId);
+        ResultSet rs = ps.executeQuery();
+
+        if (rs.next()) {
+            JustificativaDTO dto = new JustificativaDTO();
+            dto.tipo = rs.getString("tipo");
+            dto.horarioId = rs.getInt("horario_id");
+            return dto;
+        }
+        return null;
+    }
+
+    // Limpeza robusta
+    private void deletarUsuarioPeloEmail(String email) throws SQLException {
+        PreparedStatement psBusca = con.prepareStatement("SELECT id FROM usuario WHERE email = ?");
+        psBusca.setString(1, email);
+        ResultSet rs = psBusca.executeQuery();
         
+        if (rs.next()) {
+            int id = rs.getInt("id");
+            // Limpa dependências
+            con.prepareStatement("DELETE FROM justificativa WHERE usuario_id = " + id).executeUpdate();
+            con.prepareStatement("DELETE FROM horarios WHERE usuario_id = " + id).executeUpdate();
+            con.prepareStatement("DELETE FROM usuario WHERE id = " + id).executeUpdate();
+        }
     }
 
     @AfterAll
-   void fecharConexao() throws SQLException {
-       
-      
-        con.close();
+    void tearDown() throws SQLException {
+        deletarUsuarioPeloEmail("teste_integracao@teste.com");
+        if (con != null && !con.isClosed()) con.close();
     }
 }
